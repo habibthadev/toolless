@@ -17,10 +17,10 @@
   "author": "habibthadev",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/habibthadev/toolless.git"
+    "url": "git+https://github.com/habibthadev/toollessdb.git"
   },
   "bugs": {
-    "url": "https://github.com/habibthadev/toolless/issues"
+    "url": "https://github.com/habibthadev/toollessdb/issues"
   },
   "homepage": "https://toolless.dev",
   "bin": {
