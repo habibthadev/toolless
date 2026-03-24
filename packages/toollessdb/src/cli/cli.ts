@@ -22,8 +22,8 @@ import { registerStatsCommand } from "./commands/stats";
 const program = new Command();
 
 program
-  .name("toollessdb")
-  .description("Command-line interface for toollessdb database")
+  .name("toolless")
+  .description("Command-line interface for toolless database")
   .version("1.0.0");
 
 registerListCommand(program);

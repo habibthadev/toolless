@@ -2,7 +2,7 @@
 
 A file-based, document-oriented database for Node.js with MongoDB-compatible API, crash-safe append-only NDJSON storage, and zero infrastructure requirements.
 
-[![npm version](https://img.shields.io/npm/v/toollessdb.svg)](https://www.npmjs.com/package/toollessdb)
+[![npm version](https://img.shields.io/npm/v/toolless.svg)](https://www.npmjs.com/package/toolless)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 **Documentation**: [toolless.dev](https://toolless.dev)
@@ -23,19 +23,19 @@ A file-based, document-oriented database for Node.js with MongoDB-compatible API
 ## Installation
 
 ```bash
-npm install toollessdb
+npm install toolless
 ```
 
 For the CLI:
 
 ```bash
-npm install -g toollessdb
+npm install -g toolless
 ```
 
 ## Quick Start
 
 ```typescript
-import { createClient } from "toollessdb";
+import { createClient } from "toolless";
 import { z } from "zod";
 
 // Create a client pointing to a directory
@@ -87,7 +87,7 @@ await client.close();
 ### Client
 
 ```typescript
-import { createClient } from "toollessdb";
+import { createClient } from "toolless";
 
 const client = createClient({
   path: "./data", // Directory for database files
@@ -277,56 +277,56 @@ await coll.compact();
 
 ```bash
 # List databases
-toollessdb list
+toolless list
 
 # List collections in a database
-toollessdb list mydb
+toolless list mydb
 
 # Query documents
-toollessdb query mydb users
-toollessdb query mydb users -f '{"age": {"$gte": 18}}'
-toollessdb query mydb users --sort '{"createdAt": -1}' --limit 10
+toolless query mydb users
+toolless query mydb users -f '{"age": {"$gte": 18}}'
+toolless query mydb users --sort '{"createdAt": -1}' --limit 10
 
 # Insert a document
-toollessdb insert mydb users '{"name": "Alice", "age": 30}'
+toolless insert mydb users '{"name": "Alice", "age": 30}'
 
 # Update documents
-toollessdb update mydb users '{"name": "Alice"}' '{"$set": {"age": 31}}'
-toollessdb update mydb users '{"status": "pending"}' '{"$set": {"status": "done"}}' --many
+toolless update mydb users '{"name": "Alice"}' '{"$set": {"age": 31}}'
+toolless update mydb users '{"status": "pending"}' '{"$set": {"status": "done"}}' --many
 
 # Delete documents
-toollessdb delete mydb users '{"_id": "507f1f77..."}'
-toollessdb delete mydb users '{"status": "expired"}' --many
+toolless delete mydb users '{"_id": "507f1f77..."}'
+toolless delete mydb users '{"status": "expired"}' --many
 
 # Export/Import
-toollessdb export mydb users -o users.json --pretty
-toollessdb import mydb users users.json
-toollessdb import mydb users users.json --drop
+toolless export mydb users -o users.json --pretty
+toolless import mydb users users.json
+toolless import mydb users users.json --drop
 
 # Index management
-toollessdb index list mydb users
-toollessdb index create mydb users '{"email": 1}' --unique
-toollessdb index drop mydb users email_1
+toolless index list mydb users
+toolless index create mydb users '{"email": 1}' --unique
+toolless index drop mydb users email_1
 
 # Compact a collection
-toollessdb compact mydb users
-toollessdb compact mydb  # All collections
+toolless compact mydb users
+toolless compact mydb  # All collections
 
 # Drop a collection
-toollessdb drop mydb old_collection
+toolless drop mydb old_collection
 
 # Show statistics
-toollessdb stats
-toollessdb stats mydb
-toollessdb stats mydb users
+toolless stats
+toolless stats mydb
+toolless stats mydb users
 
 # Interactive shell
-toollessdb shell
-toollessdb shell -d mydb
+toolless shell
+toolless shell -d mydb
 
 # Start Studio web interface
-toollessdb studio
-toollessdb studio --port 3000
+toolless studio
+toolless studio --port 3000
 ```
 
 ### Shell Commands
@@ -348,7 +348,7 @@ toollessdb studio --port 3000
 Start the web-based data browser:
 
 ```bash
-toollessdb studio
+toolless studio
 ```
 
 Open http://localhost:4000 to:
@@ -390,7 +390,7 @@ import {
   DuplicateKeyError,
   ValidationError,
   DocumentNotFoundError,
-} from "toollessdb";
+} from "toolless";
 
 try {
   await users.insertOne({ email: "alice@example.com" });

@@ -1,4 +1,4 @@
-import { createClient } from "toollessdb";
+import { createClient } from "toolless";
 
 export const db = createClient("./data");
 

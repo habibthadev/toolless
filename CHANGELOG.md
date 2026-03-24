@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2026-03-24
 
-Initial release of Toolless - a file-based document database for Node.js.
+Initial release of Toollessdb - a file-based document database for Node.js.
 
 ### Added
 

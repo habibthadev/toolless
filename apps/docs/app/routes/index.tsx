@@ -147,7 +147,7 @@ function InstallCommand() {
 
   const copy = () => {
     if (typeof navigator === "undefined") return;
-    navigator.clipboard.writeText("npm install -g toollessdb");
+    navigator.clipboard.writeText("npm install -g toolless");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -159,7 +159,7 @@ function InstallCommand() {
     >
       <span className="text-fd-muted-foreground/60">$</span>
       <code className="font-mono text-sm font-medium text-fd-foreground">
-        npm install -g toollessdb
+        npm install -g toolless
       </code>
       <div className="flex h-8 w-8 items-center justify-center rounded-md transition-colors group-hover:bg-fd-accent">
         {copied ? (
@@ -278,11 +278,11 @@ function CodeShowcase() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
-          <Step number={1} title="Install" code="npm install toollessdb" language="bash" />
+          <Step number={1} title="Install" code="npm install toolless" language="bash" />
           <Step
             number={2}
             title="Connect"
-            code={`import { createClient } from 'toollessdb';
+            code={`import { createClient } from 'toolless';
 
 const client = createClient({
   path: './data'
@@ -337,7 +337,7 @@ function Step({
 }
 
 function FullExample() {
-  const code = `import { createClient } from 'toollessdb';
+  const code = `import { createClient } from 'toolless';
 
 const client = createClient({ path: './data' });
 const db = client.db('myapp');

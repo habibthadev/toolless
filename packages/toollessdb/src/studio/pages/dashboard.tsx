@@ -68,7 +68,7 @@ export default function Dashboard() {
           <h3 className="font-medium mb-1">No databases found</h3>
           <p className="text-sm text-muted-foreground mb-4">Create a database using the CLI</p>
           <code className="inline-block bg-muted px-3 py-1.5 rounded text-xs font-mono">
-            toollessdb insert mydb users '&#123;"name": "value"&#125;'
+            toolless insert mydb users '&#123;"name": "value"&#125;'
           </code>
         </div>
       ) : (

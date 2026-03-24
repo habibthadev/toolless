@@ -318,7 +318,7 @@ export function registerShellCommand(program: Command): void {
           ? state.currentColl
             ? `${state.currentDb}.${state.currentColl}`
             : state.currentDb
-          : "toollessdb";
+          : "toolless";
         rl.question(colors.primary(`${prefix}> `), async (input) => {
           await executeCommand(state, input);
           prompt();

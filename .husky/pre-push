@@ -3,7 +3,7 @@
 
 echo "Running pre-push checks..."
 
-cd packages/toolless
+cd packages/toollessdb
 
 echo "Running full test suite..."
 pnpm test || exit 1

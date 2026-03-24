@@ -2,7 +2,7 @@
 
 echo "Running pre-commit checks..."
 
-cd packages/toolless
+cd packages/toollessdb
 
 echo "Type checking..."
 pnpm typecheck || exit 1

@@ -9,7 +9,7 @@ describe("Schema Validation", () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "toollessdb-schema-test-"));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "toolless-schema-test-"));
   });
 
   afterEach(async () => {

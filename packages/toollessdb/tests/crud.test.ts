@@ -17,7 +17,7 @@ describe("CRUD Operations", () => {
   let client: ReturnType<typeof createClient>;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "toollessdb-crud-test-"));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "toolless-crud-test-"));
     client = createClient({ path: tmpDir });
   });
 
