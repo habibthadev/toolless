@@ -6,7 +6,7 @@ description: Delete command reference
 ## Syntax
 
 ```bash title="delete.sh"
-toolless delete <database> <collection> <filter>
+toollessdb delete <database> <collection> <filter>
   --path <path>        Path to database directory (default: ".")
   --many               Delete all matching documents
   --json               Output result as JSON
@@ -35,7 +35,7 @@ toolless delete <database> <collection> <filter>
 Delete a single document:
 
 ```bash title="delete.sh"
-toolless delete mydb users '{"active":false}'
+toollessdb delete mydb users '{"active":false}'
 ```
 
 <Callout type="warn" title="Single vs Many">
@@ -45,17 +45,17 @@ toolless delete mydb users '{"active":false}'
 Delete by ID:
 
 ```bash title="delete.sh"
-toolless delete mydb users '{"_id":"507f1f77bcf86cd799439011"}'
+toollessdb delete mydb users '{"_id":"507f1f77bcf86cd799439011"}'
 ```
 
 Delete all matching documents:
 
 ```bash title="delete.sh"
-toolless delete mydb users '{"status":"archived"}' --many
+toollessdb delete mydb users '{"status":"archived"}' --many
 ```
 
 Output result as JSON:
 
 ```bash title="delete.sh"
-toolless delete mydb users '{"archived":true}' --json
+toollessdb delete mydb users '{"archived":true}' --json
 ```

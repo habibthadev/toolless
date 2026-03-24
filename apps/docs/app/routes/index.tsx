@@ -147,7 +147,7 @@ function InstallCommand() {
 
   const copy = () => {
     if (typeof navigator === "undefined") return;
-    navigator.clipboard.writeText("npm install -g toolless");
+    navigator.clipboard.writeText("npm install -g toollessdb");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -159,7 +159,7 @@ function InstallCommand() {
     >
       <span className="text-fd-muted-foreground/60">$</span>
       <code className="font-mono text-sm font-medium text-fd-foreground">
-        npm install -g toolless
+        npm install -g toollessdb
       </code>
       <div className="flex h-8 w-8 items-center justify-center rounded-md transition-colors group-hover:bg-fd-accent">
         {copied ? (
@@ -278,11 +278,11 @@ function CodeShowcase() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
-          <Step number={1} title="Install" code="npm install toolless" language="bash" />
+          <Step number={1} title="Install" code="npm install toollessdb" language="bash" />
           <Step
             number={2}
             title="Connect"
-            code={`import { createClient } from 'toolless';
+            code={`import { createClient } from 'toollessdb';
 
 const client = createClient({
   path: './data'
@@ -337,7 +337,7 @@ function Step({
 }
 
 function FullExample() {
-  const code = `import { createClient } from 'toolless';
+  const code = `import { createClient } from 'toollessdb';
 
 const client = createClient({ path: './data' });
 const db = client.db('myapp');
@@ -558,7 +558,7 @@ function Footer() {
           </div>
           <div className="flex items-center gap-6">
             <a
-              href="https://github.com/habibthadev/toolless"
+              href="https://github.com/habibthadev/toollessdb"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-fd-muted-foreground transition-colors hover:text-fd-foreground"

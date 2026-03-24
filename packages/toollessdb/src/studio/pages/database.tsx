@@ -55,7 +55,7 @@ export default function DatabasePage() {
           <h3 className="font-medium mb-1">No collections found</h3>
           <p className="text-sm text-muted-foreground mb-4">Create a collection using the CLI</p>
           <code className="inline-block bg-muted px-3 py-1.5 rounded text-xs font-mono">
-            toolless insert {dbName} users '&#123;"name": "value"&#125;'
+            toollessdb insert {dbName} users '&#123;"name": "value"&#125;'
           </code>
         </div>
       ) : (

@@ -8,7 +8,7 @@ description: Create your first database and learn the basics
 The client manages your database directory:
 
 ```typescript title="app.ts"
-import { createClient } from "toolless";
+import { createClient } from "toollessdb";
 
 const client = createClient({ path: "./data" });
 ```
@@ -119,7 +119,7 @@ await users.deleteMany({ category: "inactive" });
 ## Complete Example
 
 ```typescript title="blog.ts"
-import { createClient } from "toolless";
+import { createClient } from "toollessdb";
 
 async function main() {
   const client = createClient({ path: "./data" });

@@ -6,7 +6,7 @@ description: Insert command reference
 ## Syntax
 
 ```bash title="insert.sh"
-toolless insert <database> <collection> <document>
+toollessdb insert <database> <collection> <document>
   --path <path>        Path to database directory (default: ".")
   --json               Output result as JSON
 ```
@@ -33,7 +33,7 @@ toolless insert <database> <collection> <document>
 Insert a single document:
 
 ```bash title="insert.sh"
-toolless insert mydb users '{"name":"Alice","email":"alice@example.com"}'
+toollessdb insert mydb users '{"name":"Alice","email":"alice@example.com"}'
 ```
 
 <Callout type="info" title="JSON Format">
@@ -43,11 +43,11 @@ toolless insert mydb users '{"name":"Alice","email":"alice@example.com"}'
 Insert with custom database path:
 
 ```bash title="insert.sh"
-toolless insert mydb users '{"name":"Bob"}' --path /data/mydb
+toollessdb insert mydb users '{"name":"Bob"}' --path /data/mydb
 ```
 
 Output result as JSON:
 
 ```bash title="insert.sh"
-toolless insert mydb users '{"name":"Charlie"}' --json
+toollessdb insert mydb users '{"name":"Charlie"}' --json
 ```

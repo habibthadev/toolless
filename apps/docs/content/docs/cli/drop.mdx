@@ -8,7 +8,7 @@ The `drop` command permanently removes databases or collections and all their da
 ## Usage
 
 ```bash title="Terminal"
-toolless drop <database> [collection] [options]
+toollessdb drop <database> [collection] [options]
 ```
 
 ## Options
@@ -42,7 +42,7 @@ toolless drop <database> [collection] [options]
 ### Drop Entire Database
 
 ```bash title="Terminal"
-toolless drop myapp
+toollessdb drop myapp
 ```
 
 This prompts for confirmation before deleting the entire `myapp` database.
@@ -55,7 +55,7 @@ Are you sure? (y/N):
 ### Drop Specific Collection
 
 ```bash title="Terminal"
-toolless drop myapp users
+toollessdb drop myapp users
 ```
 
 Prompts before deleting only the `users` collection:
@@ -68,7 +68,7 @@ Are you sure? (y/N):
 ### Force Drop (No Confirmation)
 
 ```bash title="Terminal"
-toolless drop myapp --force
+toollessdb drop myapp --force
 ```
 
 <Callout type="warn">
@@ -78,7 +78,7 @@ toolless drop myapp --force
 ### Drop from Custom Path
 
 ```bash title="Terminal"
-toolless drop myapp users -p /path/to/databases
+toollessdb drop myapp users -p /path/to/databases
 ```
 
 ## Safety
@@ -96,8 +96,8 @@ toolless drop myapp users -p /path/to/databases
 ## Alternative: Backup Before Drop
 
 ```bash title="Terminal"
-toolless export myapp users backup.jsonl
-toolless drop myapp users
+toollessdb export myapp users backup.jsonl
+toollessdb drop myapp users
 ```
 
 This exports the collection before dropping it, allowing recovery if needed.

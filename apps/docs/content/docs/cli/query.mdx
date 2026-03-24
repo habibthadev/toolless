@@ -6,7 +6,7 @@ description: Query documents from a collection
 ## Syntax
 
 ```bash title="Terminal"
-toolless query <database> <collection> [options]
+toollessdb query <database> <collection> [options]
 ```
 
 Alias: `toolless q`
@@ -36,53 +36,53 @@ Alias: `toolless q`
 Query all documents:
 
 ```bash title="Terminal"
-toolless query myapp users
+toollessdb query myapp users
 ```
 
 Query with filter:
 
 ```bash title="Terminal"
-toolless query myapp users -f '{"active": true}'
+toollessdb query myapp users -f '{"active": true}'
 ```
 
 Complex filter with operators:
 
 ```bash title="Terminal"
-toolless query myapp users -f '{"age": {"$gte": 18}, "role": {"$in": ["admin", "moderator"]}}'
+toollessdb query myapp users -f '{"age": {"$gte": 18}, "role": {"$in": ["admin", "moderator"]}}'
 ```
 
 Sort results:
 
 ```bash title="Terminal"
-toolless query myapp posts -s '{"createdAt": -1}' -l 10
+toollessdb query myapp posts -s '{"createdAt": -1}' -l 10
 ```
 
 Select specific fields:
 
 ```bash title="Terminal"
-toolless query myapp users --fields name,email,role
+toollessdb query myapp users --fields name,email,role
 ```
 
 Get count only:
 
 ```bash title="Terminal"
-toolless query myapp users -f '{"active": true}' --count
+toollessdb query myapp users -f '{"active": true}' --count
 ```
 
 Output as JSON:
 
 ```bash title="Terminal"
-toolless query myapp users -f '{"role": "admin"}' --json
+toollessdb query myapp users -f '{"role": "admin"}' --json
 ```
 
 Pagination:
 
 ```bash title="Terminal"
 # First page
-toolless query myapp users -l 20 -k 0
+toollessdb query myapp users -l 20 -k 0
 
 # Second page
-toolless query myapp users -l 20 -k 20
+toollessdb query myapp users -l 20 -k 20
 ```
 
 <Callout type="info">

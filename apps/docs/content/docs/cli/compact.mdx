@@ -8,7 +8,7 @@ The `compact` command optimizes database files by removing deleted records and r
 ## Usage
 
 ```bash title="Terminal"
-toolless compact <database> [collection] [options]
+toollessdb compact <database> [collection] [options]
 ```
 
 ## Options
@@ -37,7 +37,7 @@ toolless compact <database> [collection] [options]
 ### Compact Entire Database
 
 ```bash title="Terminal"
-toolless compact myapp
+toollessdb compact myapp
 ```
 
 This compacts all collections in the `myapp` database.
@@ -45,7 +45,7 @@ This compacts all collections in the `myapp` database.
 ### Compact Specific Collection
 
 ```bash title="Terminal"
-toolless compact myapp users
+toollessdb compact myapp users
 ```
 
 This compacts only the `users` collection.
@@ -53,7 +53,7 @@ This compacts only the `users` collection.
 ### Compact from Custom Path
 
 ```bash title="Terminal"
-toolless compact myapp -p /path/to/databases
+toollessdb compact myapp -p /path/to/databases
 ```
 
 ## What Compaction Does

@@ -6,7 +6,7 @@ description: Update command reference
 ## Syntax
 
 ```bash title="update.sh"
-toolless update <database> <collection> <filter> <update>
+toollessdb update <database> <collection> <filter> <update>
   --path <path>        Path to database directory (default: ".")
   --many               Update all matching documents
   --upsert             Create document if not found
@@ -38,13 +38,13 @@ toolless update <database> <collection> <filter> <update>
 Update a single document:
 
 ```bash title="update.sh"
-toolless update mydb users '{"name":"Alice"}' '{"$set":{"age":31}}'
+toollessdb update mydb users '{"name":"Alice"}' '{"$set":{"age":31}}'
 ```
 
 Update all matching documents:
 
 ```bash title="update.sh"
-toolless update mydb users '{"active":false}' '{"$set":{"status":"inactive"}}' --many
+toollessdb update mydb users '{"active":false}' '{"$set":{"status":"inactive"}}' --many
 ```
 
 <Callout type="info" title="Upsert Option">
@@ -54,11 +54,11 @@ toolless update mydb users '{"active":false}' '{"$set":{"status":"inactive"}}' -
 Update with upsert:
 
 ```bash title="update.sh"
-toolless update mydb users '{"email":"new@example.com"}' '{"$set":{"name":"New User"}}' --upsert
+toollessdb update mydb users '{"email":"new@example.com"}' '{"$set":{"name":"New User"}}' --upsert
 ```
 
 Output result as JSON:
 
 ```bash title="update.sh"
-toolless update mydb users '{"_id":"507f1f77bcf86cd799439011"}' '{"$set":{"status":"active"}}' --json
+toollessdb update mydb users '{"_id":"507f1f77bcf86cd799439011"}' '{"$set":{"status":"active"}}' --json
 ```

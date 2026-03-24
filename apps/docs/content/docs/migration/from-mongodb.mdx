@@ -35,13 +35,13 @@ mongodump --db mydb --out ./backup
 ## Import to Toolless
 
 ```bash
-toolless import mydb users users.json
+toollessdb import mydb users users.json
 ```
 
 Or via API:
 
 ```typescript
-import { createClient } from "toolless";
+import { createClient } from "toollessdb";
 import fs from "fs";
 
 const client = createClient({ path: "./data" });
@@ -105,7 +105,7 @@ const users = db.collection("users");
 ### After (Toolless)
 
 ```typescript
-import { createClient } from "toolless";
+import { createClient } from "toollessdb";
 
 const client = createClient({ path: "./data" });
 const db = client.db("mydb");

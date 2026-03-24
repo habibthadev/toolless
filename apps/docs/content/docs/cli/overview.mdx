@@ -44,25 +44,25 @@ All commands support these options:
 
 ```bash title="Terminal"
 # List all databases
-toolless list
+toollessdb list
 
 # Query users collection
-toolless query myapp users -f '{"active": true}'
+toollessdb query myapp users -f '{"active": true}'
 
 # Insert a document
-toolless insert myapp users '{"name": "Alice", "email": "alice@example.com"}'
+toollessdb insert myapp users '{"name": "Alice", "email": "alice@example.com"}'
 
 # Update documents
-toolless update myapp users '{"name": "Alice"}' '{"$set": {"verified": true}}'
+toollessdb update myapp users '{"name": "Alice"}' '{"$set": {"verified": true}}'
 
 # Delete documents
-toolless delete myapp users '{"inactive": true}' --many
+toollessdb delete myapp users '{"inactive": true}' --many
 
 # Launch studio
-toolless studio ./data
+toollessdb studio ./data
 
 # Interactive shell
-toolless shell -d myapp
+toollessdb shell -d myapp
 ```
 
 <Callout type="info">

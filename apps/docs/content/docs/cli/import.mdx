@@ -6,7 +6,7 @@ description: Import command reference
 ## Syntax
 
 ```bash title="import.sh"
-toolless import <database> <collection> <file>
+toollessdb import <database> <collection> <file>
   --path <path>        Path to database directory (default: ".")
   --drop               Drop collection before import
 ```
@@ -31,7 +31,7 @@ toolless import <database> <collection> <file>
 Import from a JSON file:
 
 ```bash title="import.sh"
-toolless import mydb users data.json
+toollessdb import mydb users data.json
 ```
 
 <Callout type="warn" title="Drop Collection">
@@ -41,13 +41,13 @@ toolless import mydb users data.json
 Import with drop (replaces all documents):
 
 ```bash title="import.sh"
-toolless import mydb users data.json --drop
+toollessdb import mydb users data.json --drop
 ```
 
 Import from custom database path:
 
 ```bash title="import.sh"
-toolless import mydb users users.json --path /data/mydb
+toollessdb import mydb users users.json --path /data/mydb
 ```
 
 Import NDJSON (newline-delimited JSON):

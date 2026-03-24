@@ -6,7 +6,7 @@ description: Studio command reference
 ## Syntax
 
 ```bash title="studio.sh"
-toolless studio [dbPath]
+toollessdb studio [dbPath]
   --port <port>        Port to listen on (default: 4000)
   --host <host>        Host to bind to (default: localhost)
 ```
@@ -29,7 +29,7 @@ toolless studio [dbPath]
 Start studio for current directory:
 
 ```bash title="studio.sh"
-toolless studio
+toollessdb studio
 ```
 
 <Callout type="info" title="Default Access">
@@ -39,19 +39,19 @@ toolless studio
 With custom port:
 
 ```bash title="studio.sh"
-toolless studio --port 8080
+toollessdb studio --port 8080
 ```
 
 Specify database path:
 
 ```bash title="studio.sh"
-toolless studio ./my-data
+toollessdb studio ./my-data
 ```
 
 Bind to all interfaces:
 
 ```bash title="studio.sh"
-toolless studio --host 0.0.0.0 --port 5000
+toollessdb studio --host 0.0.0.0 --port 5000
 ```
 
 <Callout type="warn" title="Network Access">

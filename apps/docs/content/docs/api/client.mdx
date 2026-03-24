@@ -6,7 +6,7 @@ description: Create and manage database connections
 ## Creating a Client
 
 ```typescript title="app.ts"
-import { createClient } from "toolless";
+import { createClient } from "toollessdb";
 
 const client = createClient({ path: "./data" });
 ```
@@ -63,7 +63,7 @@ await client.close();
 ## Complete Example
 
 ```typescript title="example.ts"
-import { createClient } from "toolless";
+import { createClient } from "toollessdb";
 
 async function main() {
   const client = createClient({ path: "./data" });

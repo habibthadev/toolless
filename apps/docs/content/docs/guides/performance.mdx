@@ -86,7 +86,7 @@ Collections are loaded into memory. For large collections:
 Over time, deleted documents leave gaps. Compact to reclaim space:
 
 ```bash
-toolless compact mydb users
+toollessdb compact mydb users
 ```
 
 Auto-compaction triggers at 50% dead ratio.
@@ -96,7 +96,7 @@ Auto-compaction triggers at 50% dead ratio.
 Check collection stats:
 
 ```bash
-toolless stats mydb users
+toollessdb stats mydb users
 ```
 
 Output:

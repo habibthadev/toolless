@@ -1,5 +1,5 @@
 {
-  "name": "toolless",
+  "name": "toollessdb",
   "version": "1.0.0",
   "description": "A file-based document database for Node.js with MongoDB-compatible API, CLI, and Studio UI",
   "keywords": [
@@ -24,7 +24,7 @@
   },
   "homepage": "https://toolless.dev",
   "bin": {
-    "toolless": "./dist/cli.js"
+    "toollessdb": "./dist/cli.js"
   },
   "files": [
     "dist"

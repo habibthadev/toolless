@@ -8,7 +8,7 @@ description: Install Toolless and set up your first database
 Install Toolless using your preferred package manager:
 
 ```bash title="npm"
-npm install toolless
+npm install toollessdb
 ```
 
 ```bash title="pnpm"
@@ -28,7 +28,7 @@ yarn add toolless
 For command-line access from anywhere:
 
 ```bash title="Terminal"
-npm install -g toolless
+npm install -g toollessdb
 ```
 
 Verify the installation:
@@ -42,7 +42,7 @@ toolless --version
 Create a simple test to verify everything works:
 
 ```typescript title="test.ts"
-import { createClient } from "toolless";
+import { createClient } from "toollessdb";
 
 const client = createClient({ path: "./test-data" });
 const db = client.db("test");
@@ -66,14 +66,14 @@ For a new project:
 ```bash title="Terminal"
 mkdir my-project && cd my-project
 npm init -y
-npm install toolless typescript tsx
+npm install toollessdb typescript tsx
 mkdir data
 ```
 
 Create your database module:
 
 ```typescript title="src/db.ts"
-import { createClient } from "toolless";
+import { createClient } from "toollessdb";
 
 const client = createClient({ path: "./data" });
 const db = client.db("myapp");
