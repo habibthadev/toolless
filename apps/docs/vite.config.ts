@@ -13,7 +13,7 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   ssr: {
-    noExternal: ["fumadocs-ui", "fumadocs-core", "aria-hidden", /@radix-ui\/.*/],
+    noExternal: true, // Bundle all dependencies for Vercel deployment
   },
   build: {
     commonjsOptions: {

@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, writeFileSync, readdirSync, readFileSync } from "node:fs";
+import { cpSync, mkdirSync, writeFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -27,16 +27,13 @@ copyDirSync(join(distDir, "client"), join(outputDir, "static"));
 
 copyDirSync(join(distDir, "server"), join(outputDir, "functions/ssr.func"));
 
-// Read package.json to extract dependencies
-const pkgJson = JSON.parse(readFileSync(join(__dirname, "package.json"), "utf-8"));
-
-// Create package.json for the serverless function with only production dependencies
+// Since all dependencies are bundled into server.js with ssr.noExternal: true,
+// we only need a minimal package.json for ES module support
 writeFileSync(
   join(outputDir, "functions/ssr.func/package.json"),
   JSON.stringify(
     {
       type: "module",
-      dependencies: pkgJson.dependencies,
     },
     null,
     2
