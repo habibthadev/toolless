@@ -1,0 +1,18 @@
+# Build and dist
+dist
+node_modules
+.turbo
+.vercel
+.output
+
+# Generated files
+coverage
+.tmp
+**/*.gen.ts
+**/.source/**
+
+# Dependencies
+pnpm-lock.yaml
+
+# Logs
+*.log
