@@ -1,0 +1,11 @@
+#!/bin/sh
+
+echo "Running pre-commit checks..."
+
+cd packages/toolless
+
+echo "Type checking..."
+pnpm typecheck || exit 1
+
+echo "Running tests..."
+pnpm test --changed || pnpm test
