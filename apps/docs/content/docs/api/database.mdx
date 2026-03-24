@@ -1,0 +1,65 @@
+---
+title: Database
+description: Database-level operations
+---
+
+## Getting a Database
+
+```typescript
+const db = client.db("myapp");
+```
+
+## Methods
+
+### collection(name)
+
+Get a collection:
+
+```typescript
+const users = db.collection("users");
+```
+
+### listCollections()
+
+List all collections in the database:
+
+```typescript
+const collections = await db.listCollections();
+// ['users', 'posts', 'comments']
+```
+
+### dropCollection(name)
+
+Drop a collection:
+
+```typescript
+await db.dropCollection("temp");
+```
+
+### stats()
+
+Get database statistics:
+
+```typescript
+const stats = await db.stats();
+// {
+//   collections: 3,
+//   documents: 1500,
+//   size: 2457600
+// }
+```
+
+## Example
+
+```typescript
+const db = client.db("myapp");
+
+const collections = await db.listCollections();
+console.log("Collections:", collections);
+
+for (const name of collections) {
+  const coll = db.collection(name);
+  const count = await coll.countDocuments({});
+  console.log(`${name}: ${count} documents`);
+}
+```

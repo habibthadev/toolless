@@ -1,0 +1,64 @@
+---
+title: update
+description: Update command reference
+---
+
+## Syntax
+
+```bash title="update.sh"
+toolless update <database> <collection> <filter> <update>
+  --path <path>        Path to database directory (default: ".")
+  --many               Update all matching documents
+  --upsert             Create document if not found
+  --json               Output result as JSON
+```
+
+**Alias:** `u`
+
+## Options
+
+| Option          | Description                   | Default |
+| --------------- | ----------------------------- | ------- |
+| `--path <path>` | Path to database directory    | `"."`   |
+| `--many`        | Update all matching documents | -       |
+| `--upsert`      | Create document if not found  | -       |
+| `--json`        | Output result as JSON         | -       |
+
+## Arguments
+
+| Argument       | Description              |
+| -------------- | ------------------------ |
+| `<database>`   | Database name            |
+| `<collection>` | Collection name          |
+| `<filter>`     | Query filter (JSON)      |
+| `<update>`     | Update operations (JSON) |
+
+## Examples
+
+Update a single document:
+
+```bash title="update.sh"
+toolless update mydb users '{"name":"Alice"}' '{"$set":{"age":31}}'
+```
+
+Update all matching documents:
+
+```bash title="update.sh"
+toolless update mydb users '{"active":false}' '{"$set":{"status":"inactive"}}' --many
+```
+
+<Callout type="info" title="Upsert Option">
+  Use `--upsert` to create the document if no matching document exists.
+</Callout>
+
+Update with upsert:
+
+```bash title="update.sh"
+toolless update mydb users '{"email":"new@example.com"}' '{"$set":{"name":"New User"}}' --upsert
+```
+
+Output result as JSON:
+
+```bash title="update.sh"
+toolless update mydb users '{"_id":"507f1f77bcf86cd799439011"}' '{"$set":{"status":"active"}}' --json
+```

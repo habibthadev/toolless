@@ -1,0 +1,134 @@
+---
+title: Migrating from MongoDB
+description: Complete guide to migrating from MongoDB to Toolless
+---
+
+## Why Migrate?
+
+Toolless is ideal when you want to:
+
+- Eliminate database infrastructure
+- Simplify development setup
+- Use file-based storage
+- Reduce operational overhead
+
+## Export from MongoDB
+
+### Using mongoexport
+
+```bash
+mongoexport --db mydb --collection users --out users.json --jsonArray
+```
+
+For large collections:
+
+```bash
+mongoexport --db mydb --collection users --out users.ndjson
+```
+
+### Using mongodump
+
+```bash
+mongodump --db mydb --out ./backup
+```
+
+## Import to Toolless
+
+```bash
+toolless import mydb users users.json
+```
+
+Or via API:
+
+```typescript
+import { createClient } from "toolless";
+import fs from "fs";
+
+const client = createClient({ path: "./data" });
+const db = client.db("mydb");
+const users = db.collection("users");
+
+const data = JSON.parse(fs.readFileSync("users.json", "utf8"));
+await users.insertMany(data);
+```
+
+## API Comparison
+
+| MongoDB          | Toolless         | Notes             |
+| ---------------- | ---------------- | ----------------- |
+| `insertOne`      | `insertOne`      | Identical         |
+| `insertMany`     | `insertMany`     | Identical         |
+| `find`           | `find`           | Identical         |
+| `findOne`        | `findOne`        | Identical         |
+| `updateOne`      | `updateOne`      | Identical         |
+| `updateMany`     | `updateMany`     | Identical         |
+| `deleteOne`      | `deleteOne`      | Identical         |
+| `deleteMany`     | `deleteMany`     | Identical         |
+| `countDocuments` | `countDocuments` | Identical         |
+| `aggregate`      | Not supported    | Use JavaScript    |
+| `transactions`   | Not supported    | Single-doc atomic |
+
+## Query Operators
+
+Most operators are supported:
+
+```typescript
+// These work the same
+find({ age: { $gte: 18 } });
+find({ $or: [{ a: 1 }, { b: 2 }] });
+find({ tags: { $in: ["a", "b"] } });
+find({ name: { $regex: /alice/i } });
+```
+
+## Update Operators
+
+```typescript
+// These work the same
+updateOne({ _id: "123" }, { $set: { name: "Alice" } });
+updateOne({ _id: "123" }, { $inc: { count: 1 } });
+updateOne({ _id: "123" }, { $push: { tags: "new" } });
+```
+
+## Code Migration
+
+### Before (MongoDB)
+
+```typescript
+import { MongoClient } from "mongodb";
+
+const client = new MongoClient("mongodb://localhost:27017");
+await client.connect();
+const db = client.db("mydb");
+const users = db.collection("users");
+```
+
+### After (Toolless)
+
+```typescript
+import { createClient } from "toolless";
+
+const client = createClient({ path: "./data" });
+const db = client.db("mydb");
+const users = db.collection("users");
+```
+
+## Limitations
+
+Features not available in Toolless:
+
+- Aggregation pipelines
+- Multi-document transactions
+- Change streams
+- Sharding
+- Replication
+
+## Migration Checklist
+
+1. Export data from MongoDB
+2. Import to Toolless
+3. Update connection code
+4. Test queries work correctly
+5. Remove aggregation pipelines
+6. Replace transactions with application logic
+7. Test thoroughly
+8. Deploy and monitor

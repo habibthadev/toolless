@@ -1,0 +1,70 @@
+---
+title: CLI Overview
+description: Command-line interface for Toolless
+---
+
+The Toolless CLI provides powerful commands to interact with your databases directly from the terminal.
+
+## Installation
+
+Install globally for CLI access:
+
+```bash title="Terminal"
+npm install -g toolless
+```
+
+## Available Commands
+
+| Command   | Alias | Description                    |
+| --------- | ----- | ------------------------------ |
+| `list`    | `ls`  | List databases and collections |
+| `query`   | `q`   | Query documents                |
+| `insert`  | `i`   | Insert a document              |
+| `update`  | `u`   | Update documents               |
+| `delete`  | `d`   | Delete documents               |
+| `export`  | -     | Export collection to JSON      |
+| `import`  | -     | Import JSON into collection    |
+| `compact` | -     | Compact collection files       |
+| `drop`    | -     | Drop a collection              |
+| `index`   | -     | Manage indexes                 |
+| `stats`   | -     | Show database statistics       |
+| `shell`   | `sh`  | Interactive REPL               |
+| `studio`  | -     | Launch web UI                  |
+
+## Global Options
+
+All commands support these options:
+
+| Option       | Description                | Default                 |
+| ------------ | -------------------------- | ----------------------- |
+| `-p, --path` | Path to database directory | `.` (current directory) |
+| `--help`     | Show command help          | -                       |
+
+## Quick Examples
+
+```bash title="Terminal"
+# List all databases
+toolless list
+
+# Query users collection
+toolless query myapp users -f '{"active": true}'
+
+# Insert a document
+toolless insert myapp users '{"name": "Alice", "email": "alice@example.com"}'
+
+# Update documents
+toolless update myapp users '{"name": "Alice"}' '{"$set": {"verified": true}}'
+
+# Delete documents
+toolless delete myapp users '{"inactive": true}' --many
+
+# Launch studio
+toolless studio ./data
+
+# Interactive shell
+toolless shell -d myapp
+```
+
+<Callout type="info">
+  Use `toolless <command> --help` to see detailed options for any command.
+</Callout>

@@ -1,0 +1,108 @@
+---
+title: Schema Validation
+description: Validate document structure with schemas
+---
+
+## Overview
+
+Toolless supports schema validation to ensure documents match expected structure before insertion or update.
+
+## Basic Validation
+
+Define a schema when getting a collection:
+
+```typescript
+import { createClient } from "toolless";
+import { z } from "zod";
+
+const client = createClient({ path: "./data" });
+const db = client.db("myapp");
+
+const UserSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  age: z.number().min(0).optional(),
+});
+
+const users = db.collection("users", UserSchema);
+```
+
+## Validation on Insert
+
+```typescript
+// Valid - passes validation
+await users.insertOne({
+  name: "Alice",
+  email: "alice@example.com",
+  age: 30,
+});
+
+// Invalid - throws ZodError
+await users.insertOne({
+  name: "", // too short
+  email: "not-an-email", // invalid format
+});
+```
+
+## Validation on Update
+
+```typescript
+// Valid update
+await users.updateOne({ name: "Alice" }, { $set: { email: "new@example.com" } });
+
+// Invalid - email format wrong
+await users.updateOne({ name: "Alice" }, { $set: { email: "invalid" } });
+```
+
+## Complex Schemas
+
+```typescript
+const PostSchema = z.object({
+  title: z.string().min(1).max(200),
+  content: z.string(),
+  author: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  tags: z.array(z.string()).default([]),
+  published: z.boolean().default(false),
+  publishedAt: z.string().datetime().optional(),
+  metadata: z.record(z.unknown()).optional(),
+});
+
+const posts = db.collection("posts", PostSchema);
+```
+
+## Error Handling
+
+```typescript
+import { ZodError } from "zod";
+
+try {
+  await users.insertOne({ name: "", email: "bad" });
+} catch (error) {
+  if (error instanceof ZodError) {
+    console.log("Validation errors:", error.errors);
+  }
+}
+```
+
+## TypeScript Integration
+
+Schemas provide automatic TypeScript types:
+
+```typescript
+type User = z.infer<typeof UserSchema>;
+// { name: string; email: string; age?: number }
+
+const user: User = await users.findOne({ name: "Alice" });
+// user is typed correctly
+```
+
+## Tips
+
+- Define schemas in separate files for reuse
+- Use `.optional()` for optional fields
+- Use `.default()` for default values
+- Validate dates with `.datetime()`
+- Use `.refine()` for custom validation

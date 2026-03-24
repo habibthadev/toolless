@@ -1,0 +1,115 @@
+---
+title: Architecture
+description: How Toolless works under the hood
+---
+
+## File-Based Storage
+
+Toolless stores all data in human-readable JSON Lines format within `.tdb` files.
+
+### Directory Structure
+
+```txt title="data/"
+data/
+├── mydb.tdb/
+│   ├── users.tdb
+│   ├── users.idx.tdb
+│   ├── posts.tdb
+│   └── comments.tdb
+└── testdb.tdb/
+    └── products.tdb
+```
+
+Each database is a directory with `.tdb` extension. Each collection is a `.tdb` file containing JSON Lines data.
+
+### Data Format
+
+One JSON document per line:
+
+```json title="users.tdb"
+{"_id":"1","name":"Alice","email":"alice@example.com"}
+{"_id":"2","name":"Bob","email":"bob@example.com"}
+{"_id":"3","name":"Charlie","email":"charlie@example.com"}
+```
+
+## Write Operations
+
+### Insert
+
+1. Generate `_id` if not provided
+2. Validate document structure
+3. Append JSON line to file
+4. Update in-memory index
+
+### Update
+
+1. Find matching documents
+2. Apply update operators
+3. Rewrite file with updated documents
+
+### Delete
+
+1. Find matching documents
+2. Rewrite file excluding deleted documents
+
+## Read Operations
+
+1. Read file line-by-line
+2. Parse each line as JSON
+3. Apply query filters
+4. Apply sort, limit, skip
+5. Return cursor
+
+## Indexing
+
+Indexes are built in memory for fast lookups:
+
+```typescript
+await users.createIndex({ email: 1 });
+```
+
+Indexes are ephemeral and rebuilt on process restart.
+
+## Concurrency
+
+### Single-Process Safe
+
+Toolless is safe for concurrent operations within a single Node.js process.
+
+### Multi-Process Unsafe
+
+Do not access the same database from multiple processes. Use a single server process for production.
+
+## When to Use Toolless
+
+**Ideal for:**
+
+- Prototyping and MVPs
+- Desktop applications
+- CLI tools
+- Development and testing
+- Small web apps (under 100K docs)
+
+**When to migrate:**
+
+- Over 100K documents per collection
+- Multi-process access needed
+- High write throughput (over 100/sec)
+- ACID transactions required
+- Distributed systems
+
+## Migration Path
+
+Toolless mirrors MongoDB's API for easy migration:
+
+```typescript
+// Toolless
+import { createClient } from "toolless";
+const client = createClient({ path: "./data" });
+
+// MongoDB
+import { MongoClient } from "mongodb";
+const client = new MongoClient("mongodb://localhost:27017");
+```
+
+Most code works with minimal changes.

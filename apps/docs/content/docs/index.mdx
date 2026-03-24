@@ -1,0 +1,60 @@
+---
+title: Toolless
+description: File-based document database with MongoDB-compatible API and zero infrastructure.
+---
+
+Toolless is a file-based document database for Node.js that provides a MongoDB-compatible API without requiring servers or external dependencies.
+
+## Quick Start
+
+```bash
+npm install toolless
+```
+
+```typescript
+import { createClient } from "toolless";
+
+const client = createClient({ path: "./data" });
+const db = client.db("myapp");
+const users = db.collection("users");
+
+await users.insertOne({
+  name: "Alice",
+  email: "alice@example.com",
+  age: 30,
+});
+
+const results = await users.find({ age: { $gte: 18 } }).toArray();
+```
+
+## Features
+
+- **MongoDB-Compatible API** - Familiar query syntax with find, update, delete and all standard operators
+- **Zero Infrastructure** - No servers to configure. Data stored in JSONL files
+- **Type-Safe** - Full TypeScript support with type inference
+- **CLI & Studio** - Command-line tools and web UI for managing data
+
+## Use Cases
+
+- Prototypes and MVPs
+- Desktop applications (Electron, Tauri)
+- CLI tools with persistent state
+- Development and testing
+- Small web apps (under 100K documents)
+- Edge functions with file-based storage
+
+## Limitations
+
+- Single-process access per database
+- Collections should stay under 100K documents
+- No distributed systems or sharding
+- No aggregation pipelines
+- No multi-collection transactions
+
+For larger systems, migrate to MongoDB or PostgreSQL.
+
+## Community
+
+- **GitHub**: [habibthadev/toolless](https://github.com/habibthadev/toolless)
+- **Issues**: Report bugs and request features
+- **License**: MIT

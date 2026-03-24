@@ -1,0 +1,81 @@
+---
+title: Managing Data
+description: Create, read, update, and delete documents in Studio
+---
+
+## Viewing Documents
+
+1. Navigate to a database from the dashboard
+2. Click on a collection to view documents
+3. Click the expand icon to see full document content
+4. Use search to filter documents
+
+## Creating Documents
+
+1. Click "New Document" button
+2. Enter valid JSON in the editor
+3. Green indicator = valid JSON
+4. Red indicator = invalid JSON
+5. Click "Create" to save
+
+Example document:
+
+```json
+{
+  "name": "Alice",
+  "email": "alice@example.com",
+  "age": 30
+}
+```
+
+The `_id` field is auto-generated if not provided.
+
+## Editing Documents
+
+1. Click "View" on any document
+2. Click "Edit" to enter edit mode
+3. Modify the JSON content
+4. Click "Save Changes"
+
+You cannot change the `_id` field during editing.
+
+## Deleting Documents
+
+1. Click "Delete" on any document
+2. Confirm in the alert dialog
+3. Document is permanently removed
+
+## Search and Filter
+
+The search bar filters documents by:
+
+- Matching any string field
+- Case-insensitive search
+- Real-time results
+
+For complex queries, use the CLI:
+
+```bash
+toolless query mydb users -f '{"age":{"$gt":25}}'
+```
+
+## JSON Validation
+
+The editor validates JSON in real-time:
+
+- **Green dot** - Valid JSON
+- **Red dot** - Invalid JSON
+
+Common errors:
+
+- Missing closing brackets
+- Trailing commas
+- Unquoted keys
+- Single quotes (use double quotes)
+
+## Tips
+
+- Use `Tab` for indentation in the editor
+- Copy documents using the copy button
+- Refresh to see latest data
+- Use keyboard shortcuts for efficiency

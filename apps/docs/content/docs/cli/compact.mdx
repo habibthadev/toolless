@@ -1,0 +1,85 @@
+---
+title: toolless compact
+description: Compact database files to reclaim space
+---
+
+The `compact` command optimizes database files by removing deleted records and reorganizing data for better performance.
+
+## Usage
+
+```bash title="Terminal"
+toolless compact <database> [collection] [options]
+```
+
+## Options
+
+<div className="overflow-x-auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Option</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>`-p, --path <path>`</td>
+        <td>Path to database directory</td>
+        <td>Current directory</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Examples
+
+### Compact Entire Database
+
+```bash title="Terminal"
+toolless compact myapp
+```
+
+This compacts all collections in the `myapp` database.
+
+### Compact Specific Collection
+
+```bash title="Terminal"
+toolless compact myapp users
+```
+
+This compacts only the `users` collection.
+
+### Compact from Custom Path
+
+```bash title="Terminal"
+toolless compact myapp -p /path/to/databases
+```
+
+## What Compaction Does
+
+- **Reclaims Space**: Removes deleted document entries
+- **Reorganizes Data**: Defragments collection files
+- **Maintains Indexes**: Rebuilds indexes for optimal performance
+- **Preserves Data**: All active documents remain intact
+
+## When to Compact
+
+Consider running compaction when:
+
+- You've deleted many documents
+- Query performance has degraded
+- Storage space needs to be reclaimed
+- After bulk delete operations
+
+<Callout type="info">
+  Compaction locks the database temporarily. Avoid running it during high-traffic periods.
+</Callout>
+
+## Performance Impact
+
+- Small collections (< 1MB): Milliseconds
+- Medium collections (1-100MB): Seconds
+- Large collections (> 100MB): Minutes
+
+The database remains accessible during compaction, but writes to the compacting collection are queued.

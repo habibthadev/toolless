@@ -1,0 +1,57 @@
+---
+title: import
+description: Import command reference
+---
+
+## Syntax
+
+```bash title="import.sh"
+toolless import <database> <collection> <file>
+  --path <path>        Path to database directory (default: ".")
+  --drop               Drop collection before import
+```
+
+## Options
+
+| Option          | Description                   | Default |
+| --------------- | ----------------------------- | ------- |
+| `--path <path>` | Path to database directory    | `"."`   |
+| `--drop`        | Drop collection before import | -       |
+
+## Arguments
+
+| Argument       | Description         |
+| -------------- | ------------------- |
+| `<database>`   | Database name       |
+| `<collection>` | Collection name     |
+| `<file>`       | JSON file to import |
+
+## Examples
+
+Import from a JSON file:
+
+```bash title="import.sh"
+toolless import mydb users data.json
+```
+
+<Callout type="warn" title="Drop Collection">
+  Use `--drop` to remove all existing documents before importing. This ensures a clean import.
+</Callout>
+
+Import with drop (replaces all documents):
+
+```bash title="import.sh"
+toolless import mydb users data.json --drop
+```
+
+Import from custom database path:
+
+```bash title="import.sh"
+toolless import mydb users users.json --path /data/mydb
+```
+
+Import NDJSON (newline-delimited JSON):
+
+```bash title="import.sh"
+cat users.ndjson | toolless import mydb users -
+```

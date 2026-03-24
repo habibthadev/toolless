@@ -1,0 +1,127 @@
+---
+title: Cursor
+description: Query result iteration and transformation
+---
+
+## Overview
+
+The `find()` method returns a cursor for lazy iteration over results.
+
+```typescript
+const cursor = users.find({ age: { $gte: 18 } });
+```
+
+## Methods
+
+### toArray()
+
+Get all results as an array:
+
+```typescript
+const results = await cursor.toArray();
+```
+
+### forEach(callback)
+
+Iterate over each document:
+
+```typescript
+await cursor.forEach((doc) => {
+  console.log(doc.name);
+});
+```
+
+### sort(spec)
+
+Sort results:
+
+```typescript
+const sorted = await users
+  .find({})
+  .sort({ age: -1 }) // Descending
+  .toArray();
+
+const multiSort = await users
+  .find({})
+  .sort({ role: 1, name: 1 }) // Ascending
+  .toArray();
+```
+
+### limit(n)
+
+Limit number of results:
+
+```typescript
+const top10 = await users.find({}).limit(10).toArray();
+```
+
+### skip(n)
+
+Skip results (for pagination):
+
+```typescript
+const page2 = await users.find({}).skip(20).limit(10).toArray();
+```
+
+### project(spec)
+
+Select specific fields:
+
+```typescript
+const names = await users.find({}).project({ name: 1, email: 1 }).toArray();
+```
+
+### count()
+
+Count matching documents:
+
+```typescript
+const count = await users.find({ active: true }).count();
+```
+
+## Chaining
+
+Methods can be chained:
+
+```typescript
+const results = await users
+  .find({ role: "member" })
+  .sort({ createdAt: -1 })
+  .skip(0)
+  .limit(20)
+  .project({ name: 1, email: 1 })
+  .toArray();
+```
+
+## Async Iteration
+
+Cursors support async iteration:
+
+```typescript
+for await (const doc of users.find({})) {
+  console.log(doc);
+}
+```
+
+## Pagination Example
+
+```typescript
+async function getPage(page: number, pageSize: number = 20) {
+  const skip = (page - 1) * pageSize;
+
+  const [items, total] = await Promise.all([
+    users.find({}).skip(skip).limit(pageSize).toArray(),
+    users.countDocuments({}),
+  ]);
+
+  return {
+    items,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  };
+}
+
+const page1 = await getPage(1);
+```

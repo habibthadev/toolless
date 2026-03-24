@@ -1,0 +1,89 @@
+---
+title: toolless list
+description: List databases or collections in your Toolless project
+---
+
+The `list` command displays databases or collections with their document counts and sizes.
+
+## Usage
+
+```bash title="Terminal"
+toolless list [database] [options]
+```
+
+## Alias
+
+```bash title="Terminal"
+toolless ls [database] [options]
+```
+
+## Options
+
+<div className="overflow-x-auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Option</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>`-p, --path <path>`</td>
+        <td>Path to database directory</td>
+        <td>Current directory</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Examples
+
+### List All Databases
+
+```bash title="Terminal"
+toolless list
+```
+
+Output:
+
+```
+┌──────────┬─────────────┬───────┐
+│ Database │ Collections │ Size  │
+├──────────┼─────────────┼───────┤
+│ myapp    │ 3           │ 45 KB │
+│ testdb   │ 2           │ 12 KB │
+└──────────┴─────────────┴───────┘
+```
+
+### List Collections in a Database
+
+```bash title="Terminal"
+toolless list myapp
+```
+
+Output:
+
+```
+┌────────────┬───────────┬────────┐
+│ Collection │ Documents │ Size   │
+├────────────┼───────────┼────────┤
+│ users      │ 150       │ 23 KB  │
+│ posts      │ 420       │ 18 KB  │
+│ comments   │ 1.2K      │ 4.1 KB │
+└────────────┴───────────┴────────┘
+```
+
+### List from Custom Path
+
+```bash title="Terminal"
+toolless list -p /path/to/databases
+```
+
+## Notes
+
+- Database sizes include all collection files and metadata
+- Document counts are fetched in real-time
+- File sizes are displayed in human-readable format (KB, MB, GB)
+- Hidden collections (prefixed with `_`) are excluded from the list

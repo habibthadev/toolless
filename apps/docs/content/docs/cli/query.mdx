@@ -1,0 +1,90 @@
+---
+title: query
+description: Query documents from a collection
+---
+
+## Syntax
+
+```bash title="Terminal"
+toolless query <database> <collection> [options]
+```
+
+Alias: `toolless q`
+
+## Arguments
+
+| Argument     | Description            |
+| ------------ | ---------------------- |
+| `database`   | Name of the database   |
+| `collection` | Name of the collection |
+
+## Options
+
+| Option         | Description                       | Default |
+| -------------- | --------------------------------- | ------- |
+| `-p, --path`   | Path to database directory        | `.`     |
+| `-f, --filter` | Filter query as JSON              | `{}`    |
+| `-s, --sort`   | Sort specification as JSON        | -       |
+| `-l, --limit`  | Limit number of results           | `20`    |
+| `-k, --skip`   | Skip number of results            | `0`     |
+| `--fields`     | Comma-separated fields to display | -       |
+| `--json`       | Output as JSON array              | -       |
+| `--count`      | Show only count                   | -       |
+
+## Examples
+
+Query all documents:
+
+```bash title="Terminal"
+toolless query myapp users
+```
+
+Query with filter:
+
+```bash title="Terminal"
+toolless query myapp users -f '{"active": true}'
+```
+
+Complex filter with operators:
+
+```bash title="Terminal"
+toolless query myapp users -f '{"age": {"$gte": 18}, "role": {"$in": ["admin", "moderator"]}}'
+```
+
+Sort results:
+
+```bash title="Terminal"
+toolless query myapp posts -s '{"createdAt": -1}' -l 10
+```
+
+Select specific fields:
+
+```bash title="Terminal"
+toolless query myapp users --fields name,email,role
+```
+
+Get count only:
+
+```bash title="Terminal"
+toolless query myapp users -f '{"active": true}' --count
+```
+
+Output as JSON:
+
+```bash title="Terminal"
+toolless query myapp users -f '{"role": "admin"}' --json
+```
+
+Pagination:
+
+```bash title="Terminal"
+# First page
+toolless query myapp users -l 20 -k 0
+
+# Second page
+toolless query myapp users -l 20 -k 20
+```
+
+<Callout type="info">
+  Filter values must be valid JSON. Use single quotes around the JSON and double quotes inside.
+</Callout>

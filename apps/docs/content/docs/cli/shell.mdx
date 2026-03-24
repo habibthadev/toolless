@@ -1,0 +1,204 @@
+---
+title: toolless shell
+description: Interactive shell for database operations
+---
+
+The `shell` command launches an interactive REPL for executing database operations with a JavaScript-like syntax.
+
+## Usage
+
+```bash title="Terminal"
+toolless shell <database> [options]
+```
+
+## Options
+
+<div className="overflow-x-auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Option</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>`-p, --path <path>`</td>
+        <td>Path to database directory</td>
+        <td>Current directory</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Getting Started
+
+```bash title="Terminal"
+toolless shell myapp
+```
+
+This opens an interactive shell connected to the `myapp` database:
+
+```
+Connected to database: myapp
+Type .help for available commands
+>
+```
+
+## Shell Commands
+
+The shell supports MongoDB-like syntax for database operations:
+
+### Show Collections
+
+```javascript
+show collections
+```
+
+### Use Collection
+
+```javascript
+use users
+```
+
+### Find Documents
+
+```javascript
+db.users.find({ age: { $gt: 18 } });
+db.users.findOne({ email: "user@example.com" });
+```
+
+### Insert Documents
+
+```javascript
+db.users.insertOne({ name: "John", age: 30 });
+db.users.insertMany([
+  { name: "Alice", age: 25 },
+  { name: "Bob", age: 35 },
+]);
+```
+
+### Update Documents
+
+```javascript
+db.users.updateOne({ name: "John" }, { $set: { age: 31 } });
+
+db.users.updateMany({ age: { $lt: 18 } }, { $set: { minor: true } });
+```
+
+### Delete Documents
+
+```javascript
+db.users.deleteOne({ name: "John" });
+db.users.deleteMany({ age: { $lt: 13 } });
+```
+
+### Count Documents
+
+```javascript
+db.users.countDocuments();
+db.users.countDocuments({ age: { $gte: 18 } });
+```
+
+## Meta Commands
+
+<div className="overflow-x-auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Command</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>`.help`</td>
+        <td>Show available commands</td>
+      </tr>
+      <tr>
+        <td>`.collections`</td>
+        <td>List all collections</td>
+      </tr>
+      <tr>
+        <td>`.stats`</td>
+        <td>Show database statistics</td>
+      </tr>
+      <tr>
+        <td>`.exit`</td>
+        <td>Exit the shell</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Features
+
+- **Auto-completion**: Tab completion for collection names and methods
+- **Command History**: Up/down arrows to navigate previous commands
+- **Pretty Printing**: Formatted JSON output for readability
+- **Error Handling**: Clear error messages with suggestions
+
+## Examples
+
+### Explore Database
+
+```javascript
+> show collections
+users
+posts
+comments
+
+> use users
+Switched to collection: users
+
+> db.users.countDocuments()
+150
+```
+
+### Query and Update
+
+```javascript
+> db.users.findOne({ role: "admin" })
+{
+  _id: "507f1f77bcf86cd799439011",
+  name: "Admin User",
+  role: "admin",
+  createdAt: "2024-01-15T10:00:00.000Z"
+}
+
+> db.users.updateOne(
+    { role: "admin" },
+    { $set: { lastLogin: new Date() } }
+  )
+Modified 1 document
+```
+
+### Batch Operations
+
+```javascript
+> db.posts.insertMany([
+    { title: "Post 1", views: 0 },
+    { title: "Post 2", views: 0 },
+    { title: "Post 3", views: 0 }
+  ])
+Inserted 3 documents
+
+> db.posts.updateMany(
+    {},
+    { $inc: { views: 1 } }
+  )
+Modified 3 documents
+```
+
+## Tips
+
+- Use `.stats` to monitor database size and document counts
+- Press `Ctrl+C` to cancel a long-running operation
+- Use `Ctrl+D` or `.exit` to close the shell
+- Commands are executed immediately (no transaction buffering)
+
+<Callout type="info">
+  The shell is great for exploration and one-off operations. For production automation, use the
+  programmatic API or CLI commands.
+</Callout>

@@ -1,0 +1,213 @@
+---
+title: toolless index
+description: Manage indexes for query optimization
+---
+
+The `index` command manages database indexes for faster query performance.
+
+## Commands
+
+### Create Index
+
+```bash title="Terminal"
+toolless index create <database> <collection> <spec> [options]
+```
+
+### List Indexes
+
+```bash title="Terminal"
+toolless index list <database> <collection> [options]
+```
+
+### Drop Index
+
+```bash title="Terminal"
+toolless index drop <database> <collection> <name> [options]
+```
+
+## Options
+
+<div className="overflow-x-auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Option</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>`-p, --path <path>`</td>
+        <td>Path to database directory</td>
+        <td>Current directory</td>
+      </tr>
+      <tr>
+        <td>`-u, --unique`</td>
+        <td>Create unique index</td>
+        <td>false</td>
+      </tr>
+      <tr>
+        <td>`-n, --name <name>`</td>
+        <td>Custom index name</td>
+        <td>Auto-generated</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Examples
+
+### Create Single Field Index
+
+```bash title="Terminal"
+toolless index create myapp users '{ "email": 1 }'
+```
+
+Creates an ascending index on the `email` field.
+
+### Create Compound Index
+
+```bash title="Terminal"
+toolless index create myapp posts '{ "userId": 1, "createdAt": -1 }'
+```
+
+Creates a compound index on `userId` (ascending) and `createdAt` (descending).
+
+### Create Unique Index
+
+```bash title="Terminal"
+toolless index create myapp users '{ "email": 1 }' --unique
+```
+
+Ensures no duplicate email values exist.
+
+### Create with Custom Name
+
+```bash title="Terminal"
+toolless index create myapp users '{ "email": 1 }' --name user_email_idx
+```
+
+### List All Indexes
+
+```bash title="Terminal"
+toolless index list myapp users
+```
+
+Output:
+
+```
+┌──────────────────┬────────────────┬────────┬──────────┐
+│ Name             │ Keys           │ Unique │ Sparse   │
+├──────────────────┼────────────────┼────────┼──────────┤
+│ _id_             │ { _id: 1 }     │ true   │ false    │
+│ email_1          │ { email: 1 }   │ true   │ false    │
+│ userId_1_date_-1 │ { userId: 1,   │ false  │ false    │
+│                  │   createdAt:-1}│        │          │
+└──────────────────┴────────────────┴────────┴──────────┘
+```
+
+### Drop Index
+
+```bash title="Terminal"
+toolless index drop myapp users email_1
+```
+
+<Callout type="warn">
+  The `_id_` index cannot be dropped—it's required for document uniqueness.
+</Callout>
+
+## Index Specification
+
+The `<spec>` parameter is a JSON object where:
+
+- **Field name**: The field to index
+- **Direction**:
+  - `1` for ascending order
+  - `-1` for descending order
+
+```json
+{
+  "field1": 1, // ascending
+  "field2": -1, // descending
+  "field3": 1 // ascending
+}
+```
+
+## Index Types
+
+### Single Field Index
+
+Optimizes queries on a single field:
+
+```bash
+'{ "age": 1 }'
+```
+
+### Compound Index
+
+Optimizes queries on multiple fields:
+
+```bash
+'{ "lastName": 1, "firstName": 1 }'
+```
+
+Supports queries like:
+
+- `{ lastName: "Smith" }`
+- `{ lastName: "Smith", firstName: "John" }`
+
+But NOT:
+
+- `{ firstName: "John" }` (must include prefix fields)
+
+### Unique Index
+
+Prevents duplicate values:
+
+```bash
+'{ "email": 1 }' --unique
+```
+
+Throws an error if you try to insert a document with an existing email.
+
+## Performance Considerations
+
+### When to Create Indexes
+
+- Fields used frequently in `find()` queries
+- Fields used in `sort()` operations
+- Fields referenced in aggregation pipelines
+- Foreign key relationships
+
+### When NOT to Index
+
+- Small collections (< 1000 documents)
+- Fields that change frequently
+- Low-cardinality fields (few unique values)
+- Write-heavy collections
+
+<Callout type="info">
+  Each index speeds up reads but slows down writes. Balance your indexes based on your access
+  patterns.
+</Callout>
+
+## Query Planning
+
+After creating indexes, use the shell to verify they're being used:
+
+```javascript
+db.users.find({ email: "user@example.com" }).explain();
+```
+
+Look for `"index": "email_1"` in the output to confirm index usage.
+
+## Rebuilding Indexes
+
+Indexes are automatically rebuilt during compaction:
+
+```bash title="Terminal"
+toolless compact myapp users
+```
+
+This optimizes index structures and reclaims space.

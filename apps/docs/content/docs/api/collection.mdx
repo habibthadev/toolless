@@ -1,0 +1,234 @@
+---
+title: Collection
+description: CRUD operations on collections
+---
+
+## Getting a Collection
+
+```typescript title="app.ts"
+const users = db.collection("users");
+```
+
+The collection file will be created as `users.tdb` inside your database directory when you first write to it.
+
+## Insert Operations
+
+### insertOne(document)
+
+Insert a single document:
+
+```typescript title="insert.ts"
+const result = await users.insertOne({
+  name: "Alice",
+  email: "alice@example.com",
+});
+
+console.log(result.insertedId);
+```
+
+<Callout type="info">
+  If you don't provide an `_id`, a unique ObjectId string is generated automatically.
+</Callout>
+
+### insertMany(documents)
+
+Insert multiple documents:
+
+```typescript title="insert-many.ts"
+const result = await users.insertMany([
+  { name: "Bob", email: "bob@example.com" },
+  { name: "Charlie", email: "charlie@example.com" },
+]);
+
+console.log(result.insertedIds);
+```
+
+## Query Operations
+
+### find(filter)
+
+Query documents (returns a cursor):
+
+```typescript title="find.ts"
+const cursor = users.find({ age: { $gte: 18 } });
+const results = await cursor.toArray();
+```
+
+See [Cursor](/docs/api/cursor) for all cursor methods.
+
+### findOne(filter)
+
+Find a single document:
+
+```typescript title="find-one.ts"
+const user = await users.findOne({ email: "alice@example.com" });
+```
+
+Returns `null` if no document matches.
+
+### countDocuments(filter)
+
+Count matching documents:
+
+```typescript title="count.ts"
+const count = await users.countDocuments({ active: true });
+```
+
+### distinct(field, filter)
+
+Get distinct values for a field:
+
+```typescript title="distinct.ts"
+const roles = await users.distinct("role", { active: true });
+// ['admin', 'user', 'guest']
+```
+
+## Update Operations
+
+### updateOne(filter, update, options)
+
+Update a single document:
+
+```typescript title="update.ts"
+const result = await users.updateOne({ email: "alice@example.com" }, { $set: { verified: true } });
+
+console.log(result.modifiedCount);
+```
+
+With upsert option:
+
+```typescript title="upsert.ts"
+await users.updateOne(
+  { email: "new@example.com" },
+  { $set: { name: "New User" } },
+  { upsert: true }
+);
+```
+
+### updateMany(filter, update)
+
+Update multiple documents:
+
+```typescript title="update-many.ts"
+const result = await users.updateMany({ role: "guest" }, { $set: { role: "member" } });
+
+console.log(result.modifiedCount);
+```
+
+### replaceOne(filter, replacement)
+
+Replace an entire document:
+
+```typescript title="replace.ts"
+await users.replaceOne({ _id: "abc123" }, { name: "Alice", email: "alice@new.com", role: "admin" });
+```
+
+<Callout type="warn">
+  `replaceOne` replaces the entire document (except `_id`). Use `updateOne` with `$set` if you want
+  to update specific fields.
+</Callout>
+
+## Delete Operations
+
+### deleteOne(filter)
+
+Delete a single document:
+
+```typescript title="delete.ts"
+const result = await users.deleteOne({ _id: "507f1f77bcf86cd799439011" });
+console.log(result.deletedCount);
+```
+
+### deleteMany(filter)
+
+Delete multiple documents:
+
+```typescript title="delete-many.ts"
+const result = await users.deleteMany({ inactive: true });
+console.log(result.deletedCount);
+```
+
+## Index Operations
+
+### createIndex(spec, options)
+
+Create an index for faster queries:
+
+```typescript title="index.ts"
+await users.createIndex({ email: 1 }, { unique: true });
+await users.createIndex({ createdAt: -1 });
+```
+
+| Option   | Type      | Description           |
+| -------- | --------- | --------------------- |
+| `unique` | `boolean` | Enforce unique values |
+| `name`   | `string`  | Custom index name     |
+
+<Callout type="info">
+  Indexes are stored in memory and rebuilt when your application restarts. They persist in
+  `.idx.tdb` files.
+</Callout>
+
+### dropIndex(name)
+
+Drop an index:
+
+```typescript title="drop-index.ts"
+await users.dropIndex("email_1");
+```
+
+### listIndexes()
+
+List all indexes:
+
+```typescript title="list-indexes.ts"
+const indexes = await users.listIndexes();
+```
+
+## Maintenance
+
+### compact()
+
+Remove deleted document space:
+
+```typescript title="compact.ts"
+await users.compact();
+```
+
+### drop()
+
+Delete the entire collection:
+
+```typescript title="drop.ts"
+await users.drop();
+```
+
+## Complete Example
+
+```typescript title="blog.ts"
+const posts = db.collection("posts");
+
+// Insert
+const { insertedId } = await posts.insertOne({
+  title: "Hello World",
+  content: "My first post",
+  tags: ["intro", "hello"],
+  published: false,
+  createdAt: new Date().toISOString(),
+});
+
+// Query with cursor chain
+const drafts = await posts.find({ published: false }).sort({ createdAt: -1 }).limit(10).toArray();
+
+// Update
+await posts.updateOne({ _id: insertedId }, { $set: { published: true } });
+
+// Count
+const publishedCount = await posts.countDocuments({ published: true });
+
+// Delete old drafts
+await posts.deleteMany({
+  published: false,
+  createdAt: { $lt: "2024-01-01" },
+});
+```

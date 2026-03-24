@@ -1,0 +1,172 @@
+---
+title: Migrating from SQLite
+description: Complete guide to migrating from SQLite to Toolless
+---
+
+## Why Migrate?
+
+| Feature     | SQLite         | Toolless   |
+| ----------- | -------------- | ---------- |
+| Data Model  | Relational     | Document   |
+| Schema      | Fixed          | Flexible   |
+| Queries     | SQL            | JavaScript |
+| Nested Data | JSON functions | Native     |
+| TypeScript  | External       | Built-in   |
+
+## Export from SQLite
+
+### Using sqlite3 CLI
+
+```bash
+sqlite3 mydb.db <<EOF
+.mode json
+.once users.json
+SELECT * FROM users;
+EOF
+```
+
+### Using Node.js
+
+```javascript
+const sqlite3 = require("sqlite3");
+const fs = require("fs");
+
+const db = new sqlite3.Database("mydb.db");
+
+db.all("SELECT * FROM users", (err, rows) => {
+  fs.writeFileSync("users.json", JSON.stringify(rows, null, 2));
+});
+
+db.close();
+```
+
+## Import to Toolless
+
+```bash
+toolless import mydb users users.json
+```
+
+## Query Translation
+
+### SELECT
+
+```sql
+-- SQLite
+SELECT * FROM users WHERE age >= 18
+```
+
+```typescript
+// Toolless
+users.find({ age: { $gte: 18 } }).toArray();
+```
+
+### SELECT with ORDER BY
+
+```sql
+-- SQLite
+SELECT * FROM users ORDER BY age DESC LIMIT 10
+```
+
+```typescript
+// Toolless
+users.find({}).sort({ age: -1 }).limit(10).toArray();
+```
+
+### INSERT
+
+```sql
+-- SQLite
+INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com')
+```
+
+```typescript
+// Toolless
+users.insertOne({ name: "Alice", email: "alice@example.com" });
+```
+
+### UPDATE
+
+```sql
+-- SQLite
+UPDATE users SET role = 'admin' WHERE email = 'alice@example.com'
+```
+
+```typescript
+// Toolless
+users.updateOne({ email: "alice@example.com" }, { $set: { role: "admin" } });
+```
+
+### DELETE
+
+```sql
+-- SQLite
+DELETE FROM users WHERE active = 0
+```
+
+```typescript
+// Toolless
+users.deleteMany({ active: false });
+```
+
+## Data Transformation
+
+### Handle NULL
+
+SQLite NULL becomes JavaScript null or undefined:
+
+```javascript
+const transform = (rows) => {
+  return rows.map((row) => {
+    const doc = {};
+    for (const [key, value] of Object.entries(row)) {
+      if (value !== null) {
+        doc[key] = value;
+      }
+    }
+    return doc;
+  });
+};
+```
+
+### Convert IDs
+
+```javascript
+const users = require("./users.json");
+
+const transformed = users.map((user) => ({
+  _id: `user_${user.id}`,
+  name: user.name,
+  email: user.email,
+}));
+```
+
+### Denormalize Relationships
+
+SQLite foreign keys become embedded documents:
+
+```javascript
+// Join users and posts
+const posts = require("./posts.json");
+const users = require("./users.json");
+
+const userMap = Object.fromEntries(users.map((u) => [u.id, u]));
+
+const denormalized = posts.map((post) => ({
+  _id: `post_${post.id}`,
+  title: post.title,
+  author: {
+    _id: `user_${post.user_id}`,
+    ...userMap[post.user_id],
+  },
+}));
+```
+
+## Migration Checklist
+
+1. Export SQLite tables to JSON
+2. Transform data (IDs, NULLs, relationships)
+3. Import to Toolless
+4. Update application code
+5. Translate SQL to document queries
+6. Test all operations
+7. Deploy and monitor

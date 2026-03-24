@@ -1,0 +1,99 @@
+---
+title: Studio Features
+description: Detailed guide to all Studio features
+---
+
+## Theme System
+
+Toggle between light and dark themes using the theme button in the navigation bar.
+
+- **Light Mode** - Bright background, dark text
+- **Dark Mode** - Dark background, light text
+- **System** - Matches your OS preference
+
+Theme choice persists across sessions via localStorage.
+
+## JSON Editor
+
+### Syntax Highlighting
+
+The editor provides:
+
+- Color-coded syntax (keys, values, brackets)
+- Automatic indentation
+- Theme-aware colors
+
+### Validation
+
+- Green indicator = valid JSON
+- Red indicator = invalid JSON
+
+### Auto-Formatting
+
+Paste any JSON and it formats automatically with proper indentation.
+
+## Keyboard Shortcuts
+
+### Global
+
+| Shortcut | Action             |
+| -------- | ------------------ |
+| `Escape` | Close modal/dialog |
+| `Ctrl+K` | Focus search bar   |
+
+### JSON Editor
+
+| Shortcut       | Action          |
+| -------------- | --------------- |
+| `Tab`          | Indent 2 spaces |
+| `Shift+Tab`    | Outdent         |
+| `Ctrl+Z`       | Undo            |
+| `Ctrl+Shift+Z` | Redo            |
+
+## Responsive Design
+
+Studio adapts to all screen sizes:
+
+- **Desktop** - Full sidebar, table view
+- **Tablet** - Collapsible sidebar
+- **Mobile** - Full-screen modals, card view
+
+## Performance
+
+### Large Collections
+
+For collections with many documents:
+
+- Pagination limits results
+- Use search to filter
+- Consider CLI for bulk operations
+
+### Caching
+
+Studio caches database metadata for faster navigation.
+
+## Troubleshooting
+
+### Studio Won't Load
+
+1. Check CLI is running: `toolless studio`
+2. Verify port is available: `lsof -i :4000`
+3. Check browser console for errors
+
+### CSS Not Loading
+
+1. Stop the CLI server
+2. Rebuild: `pnpm build`
+3. Restart server
+
+### Database Not Detected
+
+1. Check path argument
+2. Verify `.tdb` directory exists
+3. Check file permissions
+
+### JSON Won't Save
+
+1. Verify JSON is valid (green indicator)
+2. Check browser console for errors
+3. Verify write permissions

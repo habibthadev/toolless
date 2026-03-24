@@ -1,0 +1,83 @@
+---
+title: Client
+description: Create and manage database connections
+---
+
+## Creating a Client
+
+```typescript title="app.ts"
+import { createClient } from "toolless";
+
+const client = createClient({ path: "./data" });
+```
+
+You can also pass a string directly:
+
+```typescript title="app.ts"
+const client = createClient("./data");
+```
+
+## Configuration Options
+
+| Option | Type     | Default  | Description                |
+| ------ | -------- | -------- | -------------------------- |
+| `path` | `string` | Required | Path to database directory |
+
+<Callout type="info">
+  The path can be relative or absolute. Toolless will create the directory if it doesn't exist.
+</Callout>
+
+## Methods
+
+### db(name)
+
+Get a database instance:
+
+```typescript title="app.ts"
+const db = client.db("myapp");
+```
+
+If the database directory doesn't exist, it will be created automatically as `myapp.tdb/` inside your data path.
+
+### listDatabases()
+
+List all databases:
+
+```typescript title="list-dbs.ts"
+const databases = await client.listDatabases();
+// ['myapp', 'test', 'analytics']
+```
+
+### close()
+
+Close the client connection:
+
+```typescript title="cleanup.ts"
+await client.close();
+```
+
+<Callout type="warn">
+  Always close the client when done to ensure all data is flushed to disk.
+</Callout>
+
+## Complete Example
+
+```typescript title="example.ts"
+import { createClient } from "toolless";
+
+async function main() {
+  const client = createClient({ path: "./data" });
+
+  const databases = await client.listDatabases();
+  console.log("Databases:", databases);
+
+  const db = client.db("myapp");
+  const users = db.collection("users");
+
+  await users.insertOne({ name: "Alice" });
+
+  await client.close();
+}
+
+main();
+```

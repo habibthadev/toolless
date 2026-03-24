@@ -1,0 +1,103 @@
+---
+title: toolless drop
+description: Drop databases or collections
+---
+
+The `drop` command permanently removes databases or collections and all their data.
+
+## Usage
+
+```bash title="Terminal"
+toolless drop <database> [collection] [options]
+```
+
+## Options
+
+<div className="overflow-x-auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Option</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>`-p, --path <path>`</td>
+        <td>Path to database directory</td>
+        <td>Current directory</td>
+      </tr>
+      <tr>
+        <td>`-f, --force`</td>
+        <td>Skip confirmation prompt</td>
+        <td>false</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Examples
+
+### Drop Entire Database
+
+```bash title="Terminal"
+toolless drop myapp
+```
+
+This prompts for confirmation before deleting the entire `myapp` database.
+
+```
+⚠ This will permanently delete database "myapp" and all its collections.
+Are you sure? (y/N):
+```
+
+### Drop Specific Collection
+
+```bash title="Terminal"
+toolless drop myapp users
+```
+
+Prompts before deleting only the `users` collection:
+
+```
+⚠ This will permanently delete collection "users" from database "myapp".
+Are you sure? (y/N):
+```
+
+### Force Drop (No Confirmation)
+
+```bash title="Terminal"
+toolless drop myapp --force
+```
+
+<Callout type="warn">
+  The `--force` flag bypasses confirmation. Use with extreme caution in scripts.
+</Callout>
+
+### Drop from Custom Path
+
+```bash title="Terminal"
+toolless drop myapp users -p /path/to/databases
+```
+
+## Safety
+
+- Requires explicit confirmation unless `--force` is used
+- Shows what will be deleted before proceeding
+- Cannot be undone—data is permanently removed
+- Database files are deleted from the filesystem
+
+<Callout type="error">
+  **Warning**: Dropped data cannot be recovered. Always backup important data before using this
+  command.
+</Callout>
+
+## Alternative: Backup Before Drop
+
+```bash title="Terminal"
+toolless export myapp users backup.jsonl
+toolless drop myapp users
+```
+
+This exports the collection before dropping it, allowing recovery if needed.

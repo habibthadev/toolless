@@ -1,0 +1,197 @@
+---
+title: Update Operators
+description: Modify documents with update operators
+---
+
+## Field Update Operators
+
+### $set
+
+Sets the value of a field:
+
+```typescript title="set.ts"
+await users.updateOne({ _id: "abc123" }, { $set: { name: "Alice", email: "alice@example.com" } });
+```
+
+Can set nested fields using dot notation:
+
+```typescript title="set-nested.ts"
+await users.updateOne({ _id: "abc123" }, { $set: { "address.city": "New York" } });
+```
+
+### $unset
+
+Removes a field from the document:
+
+```typescript title="unset.ts"
+await users.updateOne({ _id: "abc123" }, { $unset: { temporaryField: "" } });
+```
+
+<Callout type="info">
+  The value passed to `$unset` doesn't matter - the field is removed regardless.
+</Callout>
+
+### $rename
+
+Renames a field:
+
+```typescript title="rename.ts"
+await users.updateOne({ _id: "abc123" }, { $rename: { old_name: "new_name" } });
+```
+
+## Numeric Operators
+
+### $inc
+
+Increments a field by a specified value:
+
+```typescript title="inc.ts"
+// Increment by 1
+await posts.updateOne({ _id: postId }, { $inc: { views: 1 } });
+
+// Decrement by using negative value
+await users.updateOne({ _id: "abc123" }, { $inc: { credits: -10 } });
+```
+
+### $mul
+
+Multiplies a field by a specified value:
+
+```typescript title="mul.ts"
+await products.updateOne(
+  { _id: productId },
+  { $mul: { price: 1.1 } } // 10% increase
+);
+```
+
+### $min
+
+Updates field only if the specified value is less than current:
+
+```typescript title="min.ts"
+await stats.updateOne({ _id: "daily" }, { $min: { lowestPrice: 99 } });
+```
+
+### $max
+
+Updates field only if the specified value is greater than current:
+
+```typescript title="max.ts"
+await stats.updateOne({ _id: "daily" }, { $max: { highestPrice: 150 } });
+```
+
+## Array Operators
+
+### $push
+
+Adds an element to an array:
+
+```typescript title="push.ts"
+await posts.updateOne(
+  { _id: postId },
+  { $push: { comments: { text: "Great post!", author: "Bob" } } }
+);
+```
+
+Push multiple elements with `$each`:
+
+```typescript title="push-each.ts"
+await posts.updateOne(
+  { _id: postId },
+  { $push: { tags: { $each: ["javascript", "tutorial", "beginner"] } } }
+);
+```
+
+### $addToSet
+
+Adds element only if it doesn't already exist:
+
+```typescript title="addToSet.ts"
+await users.updateOne({ _id: "abc123" }, { $addToSet: { roles: "editor" } });
+```
+
+With `$each` modifier:
+
+```typescript title="addToSet-each.ts"
+await users.updateOne(
+  { _id: "abc123" },
+  { $addToSet: { permissions: { $each: ["read", "write", "delete"] } } }
+);
+```
+
+### $pull
+
+Removes all elements matching a condition:
+
+```typescript title="pull.ts"
+// Remove specific value
+await users.updateOne({ _id: "abc123" }, { $pull: { tags: "deprecated" } });
+
+// Remove matching condition
+await users.updateOne({ _id: "abc123" }, { $pull: { scores: { $lt: 50 } } });
+```
+
+### $pop
+
+Removes the first or last element of an array:
+
+```typescript title="pop.ts"
+// Remove last element
+await queue.updateOne({ _id: "tasks" }, { $pop: { items: 1 } });
+
+// Remove first element
+await queue.updateOne({ _id: "tasks" }, { $pop: { items: -1 } });
+```
+
+## Date Operators
+
+### $currentDate
+
+Sets field to current date:
+
+```typescript title="currentDate.ts"
+// Set as Date
+await users.updateOne({ _id: "abc123" }, { $currentDate: { lastModified: true } });
+
+// Set as timestamp (milliseconds)
+await users.updateOne(
+  { _id: "abc123" },
+  { $currentDate: { lastModified: { $type: "timestamp" } } }
+);
+```
+
+## Combining Operators
+
+Multiple operators can be combined in a single update:
+
+```typescript title="combined.ts"
+await posts.updateOne(
+  { _id: postId },
+  {
+    $set: { title: "Updated Title" },
+    $inc: { version: 1, views: 1 },
+    $push: { history: { action: "edit", date: new Date().toISOString() } },
+    $currentDate: { updatedAt: true },
+  }
+);
+```
+
+## Update with Upsert
+
+Create document if it doesn't exist:
+
+```typescript title="upsert.ts"
+await users.updateOne(
+  { email: "new@example.com" },
+  {
+    $set: { name: "New User" },
+    $setOnInsert: { createdAt: new Date().toISOString() },
+  },
+  { upsert: true }
+);
+```
+
+<Callout type="warn">
+  Always use update operators (`$set`, `$inc`, etc.) instead of passing a plain object. A plain
+  object will replace the entire document.
+</Callout>

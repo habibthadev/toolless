@@ -1,0 +1,240 @@
+---
+title: Query Operators
+description: Filter documents with query operators
+---
+
+## Comparison Operators
+
+### $eq
+
+Matches values equal to a specified value:
+
+```typescript title="eq.ts"
+await users.find({ status: { $eq: "active" } }).toArray();
+
+// Shorthand (implicit $eq)
+await users.find({ status: "active" }).toArray();
+```
+
+### $ne
+
+Matches values not equal to a specified value:
+
+```typescript title="ne.ts"
+await users.find({ status: { $ne: "inactive" } }).toArray();
+```
+
+### $gt / $gte
+
+Greater than / Greater than or equal:
+
+```typescript title="gt.ts"
+await users.find({ age: { $gt: 18 } }).toArray();
+await users.find({ age: { $gte: 21 } }).toArray();
+```
+
+### $lt / $lte
+
+Less than / Less than or equal:
+
+```typescript title="lt.ts"
+await users.find({ age: { $lt: 65 } }).toArray();
+await users.find({ price: { $lte: 100 } }).toArray();
+```
+
+### $in
+
+Matches any value in an array:
+
+```typescript title="in.ts"
+await users.find({ role: { $in: ["admin", "moderator"] } }).toArray();
+```
+
+### $nin
+
+Matches none of the values in an array:
+
+```typescript title="nin.ts"
+await users.find({ status: { $nin: ["banned", "suspended"] } }).toArray();
+```
+
+## Logical Operators
+
+### $and
+
+Joins query clauses with logical AND:
+
+```typescript title="and.ts"
+await users
+  .find({
+    $and: [{ age: { $gte: 18 } }, { status: "active" }],
+  })
+  .toArray();
+
+// Implicit $and (shorthand)
+await users
+  .find({
+    age: { $gte: 18 },
+    status: "active",
+  })
+  .toArray();
+```
+
+### $or
+
+Joins query clauses with logical OR:
+
+```typescript title="or.ts"
+await users
+  .find({
+    $or: [{ role: "admin" }, { permissions: { $in: ["write"] } }],
+  })
+  .toArray();
+```
+
+### $nor
+
+Joins query clauses with logical NOR (none match):
+
+```typescript title="nor.ts"
+await users
+  .find({
+    $nor: [{ status: "banned" }, { status: "suspended" }],
+  })
+  .toArray();
+```
+
+### $not
+
+Inverts the effect of a query expression:
+
+```typescript title="not.ts"
+await users
+  .find({
+    age: { $not: { $lt: 18 } },
+  })
+  .toArray();
+```
+
+## Element Operators
+
+### $exists
+
+Matches documents that have the specified field:
+
+```typescript title="exists.ts"
+// Find documents with email field
+await users.find({ email: { $exists: true } }).toArray();
+
+// Find documents without email field
+await users.find({ email: { $exists: false } }).toArray();
+```
+
+### $type
+
+Matches documents where field is of specified type:
+
+```typescript title="type.ts"
+await users.find({ age: { $type: "number" } }).toArray();
+```
+
+Supported types: `"string"`, `"number"`, `"boolean"`, `"object"`, `"array"`, `"date"`, `"regex"`, `"null"`
+
+## String Operators
+
+### $regex
+
+Matches strings using regular expressions:
+
+```typescript title="regex.ts"
+// Case-insensitive search
+await users
+  .find({
+    name: { $regex: /alice/i },
+  })
+  .toArray();
+
+// String pattern
+await users
+  .find({
+    email: { $regex: "@gmail.com$" },
+  })
+  .toArray();
+```
+
+## Array Operators
+
+### $elemMatch
+
+Matches documents where an array element matches all specified conditions:
+
+```typescript title="elemMatch.ts"
+await orders
+  .find({
+    items: {
+      $elemMatch: {
+        product: "laptop",
+        quantity: { $gte: 2 },
+      },
+    },
+  })
+  .toArray();
+```
+
+### $all
+
+Matches arrays containing all specified elements:
+
+```typescript title="all.ts"
+await posts
+  .find({
+    tags: { $all: ["javascript", "tutorial"] },
+  })
+  .toArray();
+```
+
+### $size
+
+Matches arrays with the specified length:
+
+```typescript title="size.ts"
+await users
+  .find({
+    tags: { $size: 3 },
+  })
+  .toArray();
+```
+
+## Combining Operators
+
+Operators can be combined for complex queries:
+
+```typescript title="combined.ts"
+const results = await users
+  .find({
+    $and: [
+      { age: { $gte: 18, $lte: 65 } },
+      {
+        $or: [{ role: "admin" }, { verified: true }],
+      },
+      { tags: { $in: ["premium", "vip"] } },
+      { email: { $regex: /@company\.com$/i } },
+    ],
+  })
+  .toArray();
+```
+
+## Nested Field Queries
+
+Query nested objects using dot notation:
+
+```typescript title="nested.ts"
+await users
+  .find({
+    "address.city": "New York",
+    "address.zip": { $regex: /^10/ },
+  })
+  .toArray();
+```
+
+<Callout type="info">Dot notation works for any depth of nesting: `'a.b.c.d'`</Callout>

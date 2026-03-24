@@ -1,0 +1,171 @@
+---
+title: Getting Started
+description: Create your first database and learn the basics
+---
+
+## Creating a Client
+
+The client manages your database directory:
+
+```typescript title="app.ts"
+import { createClient } from "toolless";
+
+const client = createClient({ path: "./data" });
+```
+
+<Callout type="info">
+  The `path` option specifies where all your databases will be stored. Each database becomes a
+  folder inside this directory.
+</Callout>
+
+## Creating a Database
+
+Get a database instance (created automatically if it doesn't exist):
+
+```typescript title="app.ts"
+const db = client.db("myapp");
+```
+
+## Working with Collections
+
+Get a collection to store documents:
+
+```typescript title="app.ts"
+const users = db.collection("users");
+```
+
+## Inserting Documents
+
+Insert a single document:
+
+```typescript title="insert-one.ts"
+const result = await users.insertOne({
+  name: "Alice",
+  email: "alice@example.com",
+  age: 30,
+});
+
+console.log(result.insertedId);
+```
+
+<Callout type="info" title="Auto-generated IDs">
+  If you don't provide an `_id` field, Toolless generates a unique ObjectId automatically.
+</Callout>
+
+Insert multiple documents:
+
+```typescript title="insert-many.ts"
+const result = await users.insertMany([
+  { name: "Bob", email: "bob@example.com", age: 25 },
+  { name: "Charlie", email: "charlie@example.com", age: 35 },
+]);
+
+console.log(result.insertedIds);
+```
+
+## Querying Documents
+
+Find all documents:
+
+```typescript title="find-all.ts"
+const allUsers = await users.find({}).toArray();
+```
+
+Find with filter:
+
+```typescript title="find-filter.ts"
+const adults = await users.find({ age: { $gte: 18 } }).toArray();
+```
+
+Find one document:
+
+```typescript title="find-one.ts"
+const alice = await users.findOne({ name: "Alice" });
+```
+
+## Updating Documents
+
+Update one document:
+
+```typescript title="update-one.ts"
+await users.updateOne({ name: "Alice" }, { $set: { age: 31 } });
+```
+
+Update many documents:
+
+```typescript title="update-many.ts"
+await users.updateMany({ age: { $lt: 30 } }, { $set: { category: "young" } });
+```
+
+<Callout type="warn" title="Update Operators Required">
+  Always use update operators like `$set`, `$inc`, `$push` when updating. Passing a plain object
+  will replace the entire document.
+</Callout>
+
+## Deleting Documents
+
+Delete one document:
+
+```typescript title="delete-one.ts"
+await users.deleteOne({ name: "Alice" });
+```
+
+Delete many documents:
+
+```typescript title="delete-many.ts"
+await users.deleteMany({ category: "inactive" });
+```
+
+## Complete Example
+
+```typescript title="blog.ts"
+import { createClient } from "toolless";
+
+async function main() {
+  const client = createClient({ path: "./data" });
+  const db = client.db("blog");
+  const posts = db.collection("posts");
+
+  // Create a post
+  const { insertedId } = await posts.insertOne({
+    title: "Hello World",
+    content: "This is my first post",
+    author: "Alice",
+    published: true,
+    createdAt: new Date().toISOString(),
+  });
+
+  // Find published posts
+  const published = await posts
+    .find({ published: true })
+    .sort({ createdAt: -1 })
+    .limit(10)
+    .toArray();
+
+  // Update post
+  await posts.updateOne({ _id: insertedId }, { $set: { title: "Hello Toolless" } });
+
+  // Count posts
+  const count = await posts.countDocuments({ author: "Alice" });
+  console.log(`Alice has ${count} posts`);
+}
+
+main();
+```
+
+## File Structure
+
+After running, your data directory will look like:
+
+```txt title="data/"
+data/
+└── blog.tdb/
+    └── posts.tdb
+```
+
+Each `.tdb` file contains one JSON document per line (JSON Lines format).
+
+<Callout type="info" title="Human Readable">
+  You can open `.tdb` files in any text editor to inspect your data. Each line is a complete JSON
+  document.
+</Callout>

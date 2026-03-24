@@ -1,0 +1,85 @@
+---
+title: toolless stats
+description: Get database statistics
+---
+
+The `stats` command displays detailed statistics about a database including collection counts, document counts, and storage information.
+
+## Usage
+
+```bash title="Terminal"
+toolless stats <database> [options]
+```
+
+## Options
+
+<div className="overflow-x-auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Option</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>`-p, --path <path>`</td>
+        <td>Path to database directory</td>
+        <td>Current directory</td>
+      </tr>
+      <tr>
+        <td>`-c, --collection <name>`</td>
+        <td>Show stats for a specific collection</td>
+        <td>All collections</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Examples
+
+### Database Statistics
+
+```bash title="Terminal"
+toolless stats myapp
+```
+
+Output:
+
+```
+Database: myapp
+Collections: 3
+Total Documents: 1,770
+Total Size: 45 KB
+
+┌────────────┬───────────┬────────┐
+│ Collection │ Documents │ Size   │
+├────────────┼───────────┼────────┤
+│ users      │ 150       │ 23 KB  │
+│ posts      │ 420       │ 18 KB  │
+│ comments   │ 1.2K      │ 4.1 KB │
+└────────────┴───────────┴────────┘
+```
+
+### Collection Statistics
+
+```bash title="Terminal"
+toolless stats myapp -c users
+```
+
+Output:
+
+```
+Collection: users (myapp)
+Documents: 150
+Size: 23 KB
+Indexes: 2
+```
+
+## Notes
+
+- Statistics are calculated in real-time
+- Size includes collection data and indexes
+- Document counts reflect current state
+- Use collection flag for detailed per-collection stats

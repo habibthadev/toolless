@@ -1,0 +1,58 @@
+---
+title: export
+description: Export command reference
+---
+
+## Syntax
+
+```bash title="export.sh"
+toolless export <database> <collection>
+  --path <path>        Path to database directory (default: ".")
+  -o, --output <file>  Output file (default: stdout)
+  --pretty             Pretty print JSON
+```
+
+## Options
+
+| Option                | Description                | Default |
+| --------------------- | -------------------------- | ------- |
+| `--path <path>`       | Path to database directory | `"."`   |
+| `-o, --output <file>` | Output file                | stdout  |
+| `--pretty`            | Pretty print JSON output   | -       |
+
+## Arguments
+
+| Argument       | Description     |
+| -------------- | --------------- |
+| `<database>`   | Database name   |
+| `<collection>` | Collection name |
+
+## Examples
+
+Export to stdout:
+
+```bash title="export.sh"
+toolless export mydb users
+```
+
+<Callout type="info" title="Output Formatting">
+  By default, exports as compact JSON. Use `--pretty` for formatted output.
+</Callout>
+
+Export to file:
+
+```bash title="export.sh"
+toolless export mydb users --output users.json
+```
+
+Export with pretty formatting:
+
+```bash title="export.sh"
+toolless export mydb users --pretty --output users.json
+```
+
+Export from custom database path:
+
+```bash title="export.sh"
+toolless export mydb users --path /data/mydb --output backup.json
+```

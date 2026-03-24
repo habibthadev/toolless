@@ -1,0 +1,93 @@
+---
+title: Indexing
+description: Create and manage indexes for better query performance
+---
+
+## Overview
+
+Indexes improve query performance by creating efficient lookup structures for frequently queried fields.
+
+## Creating Indexes
+
+```typescript
+// Single field index
+await users.createIndex({ email: 1 });
+
+// Compound index
+await users.createIndex({ lastName: 1, firstName: 1 });
+
+// Unique index
+await users.createIndex({ email: 1 }, { unique: true });
+```
+
+## Index Direction
+
+- `1` = ascending order
+- `-1` = descending order
+
+For single-field indexes, direction rarely matters. For compound indexes, match your query's sort order.
+
+## Unique Indexes
+
+Prevent duplicate values:
+
+```typescript
+await users.createIndex({ email: 1 }, { unique: true });
+
+// This will fail
+await users.insertOne({ email: "alice@example.com" });
+await users.insertOne({ email: "alice@example.com" }); // Error!
+```
+
+## Listing Indexes
+
+```typescript
+const indexes = await users.listIndexes();
+console.log(indexes);
+```
+
+## Dropping Indexes
+
+```typescript
+await users.dropIndex("email_1");
+```
+
+## When to Index
+
+Index fields that are:
+
+- Frequently queried
+- Used in sort operations
+- Used in unique constraints
+
+Avoid indexing fields that:
+
+- Rarely appear in queries
+- Have low cardinality (few unique values)
+- Change frequently
+
+## Index Strategy
+
+```typescript
+// For query: find({ role: 'admin' }).sort({ createdAt: -1 })
+await users.createIndex({ role: 1, createdAt: -1 });
+
+// For query: find({ email: 'x' })
+await users.createIndex({ email: 1 });
+```
+
+## Performance Impact
+
+| Operation     | Without Index | With Index      |
+| ------------- | ------------- | --------------- |
+| Find by field | O(n) scan     | O(log n) lookup |
+| Sort          | O(n log n)    | O(n)            |
+| Insert        | O(1)          | O(log n)        |
+
+## Best Practices
+
+1. Create indexes based on actual query patterns
+2. Use compound indexes for multi-field queries
+3. Monitor query performance
+4. Remove unused indexes
+5. Index fields used in filters before sort fields

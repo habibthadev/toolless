@@ -1,0 +1,61 @@
+---
+title: delete
+description: Delete command reference
+---
+
+## Syntax
+
+```bash title="delete.sh"
+toolless delete <database> <collection> <filter>
+  --path <path>        Path to database directory (default: ".")
+  --many               Delete all matching documents
+  --json               Output result as JSON
+```
+
+**Alias:** `d`
+
+## Options
+
+| Option          | Description                   | Default |
+| --------------- | ----------------------------- | ------- |
+| `--path <path>` | Path to database directory    | `"."`   |
+| `--many`        | Delete all matching documents | -       |
+| `--json`        | Output result as JSON         | -       |
+
+## Arguments
+
+| Argument       | Description         |
+| -------------- | ------------------- |
+| `<database>`   | Database name       |
+| `<collection>` | Collection name     |
+| `<filter>`     | Query filter (JSON) |
+
+## Examples
+
+Delete a single document:
+
+```bash title="delete.sh"
+toolless delete mydb users '{"active":false}'
+```
+
+<Callout type="warn" title="Single vs Many">
+  By default, only the first matching document is deleted. Use `--many` to delete all matches.
+</Callout>
+
+Delete by ID:
+
+```bash title="delete.sh"
+toolless delete mydb users '{"_id":"507f1f77bcf86cd799439011"}'
+```
+
+Delete all matching documents:
+
+```bash title="delete.sh"
+toolless delete mydb users '{"status":"archived"}' --many
+```
+
+Output result as JSON:
+
+```bash title="delete.sh"
+toolless delete mydb users '{"archived":true}' --json
+```

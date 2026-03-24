@@ -1,0 +1,53 @@
+---
+title: insert
+description: Insert command reference
+---
+
+## Syntax
+
+```bash title="insert.sh"
+toolless insert <database> <collection> <document>
+  --path <path>        Path to database directory (default: ".")
+  --json               Output result as JSON
+```
+
+**Alias:** `i`
+
+## Options
+
+| Option          | Description                | Default |
+| --------------- | -------------------------- | ------- |
+| `--path <path>` | Path to database directory | `"."`   |
+| `--json`        | Output result as JSON      | -       |
+
+## Arguments
+
+| Argument       | Description             |
+| -------------- | ----------------------- |
+| `<database>`   | Database name           |
+| `<collection>` | Collection name         |
+| `<document>`   | JSON document to insert |
+
+## Examples
+
+Insert a single document:
+
+```bash title="insert.sh"
+toolless insert mydb users '{"name":"Alice","email":"alice@example.com"}'
+```
+
+<Callout type="info" title="JSON Format">
+  The document argument must be a valid JSON string.
+</Callout>
+
+Insert with custom database path:
+
+```bash title="insert.sh"
+toolless insert mydb users '{"name":"Bob"}' --path /data/mydb
+```
+
+Output result as JSON:
+
+```bash title="insert.sh"
+toolless insert mydb users '{"name":"Charlie"}' --json
+```

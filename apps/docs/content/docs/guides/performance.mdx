@@ -1,0 +1,119 @@
+---
+title: Performance
+description: Optimize Toolless for better performance
+---
+
+## Scalability Limits
+
+| Collection Size | Read               | Write              |
+| --------------- | ------------------ | ------------------ |
+| < 1K docs       | Excellent          | Excellent          |
+| 1K - 10K        | Excellent          | Good               |
+| 10K - 100K      | Good               | Fair               |
+| > 100K          | Consider migration | Consider migration |
+
+## Query Optimization
+
+### Use Indexes
+
+```typescript
+// Before: full collection scan
+await users.find({ email: "alice@example.com" }).toArray();
+
+// After: indexed lookup
+await users.createIndex({ email: 1 });
+await users.find({ email: "alice@example.com" }).toArray();
+```
+
+### Limit Results
+
+```typescript
+// Bad: loads entire collection
+const all = await users.find({}).toArray();
+
+// Good: paginated
+const page = await users.find({}).limit(20).skip(0).toArray();
+```
+
+### Project Only Needed Fields
+
+```typescript
+// Bad: returns full documents
+const users = await users.find({}).toArray();
+
+// Good: returns only needed fields
+const names = await users.find({}).project({ name: 1, email: 1 }).toArray();
+```
+
+## Write Optimization
+
+### Batch Inserts
+
+```typescript
+// Bad: multiple write operations
+for (const user of users) {
+  await collection.insertOne(user);
+}
+
+// Good: single write operation
+await collection.insertMany(users);
+```
+
+### Update Operators
+
+```typescript
+// Bad: replaces entire document
+await users.updateOne(
+  { _id: "123" },
+  { name: "Alice", email: "new@example.com", ...allOtherFields }
+);
+
+// Good: updates specific fields
+await users.updateOne({ _id: "123" }, { $set: { email: "new@example.com" } });
+```
+
+## Memory Management
+
+Collections are loaded into memory. For large collections:
+
+1. Split data across multiple collections
+2. Archive old data
+3. Use pagination for queries
+4. Consider migration to MongoDB
+
+## Compaction
+
+Over time, deleted documents leave gaps. Compact to reclaim space:
+
+```bash
+toolless compact mydb users
+```
+
+Auto-compaction triggers at 50% dead ratio.
+
+## Monitoring
+
+Check collection stats:
+
+```bash
+toolless stats mydb users
+```
+
+Output:
+
+```
+Collection: users
+Documents: 1,500
+File size: 2.4 MB
+Dead ratio: 15%
+```
+
+## Best Practices
+
+1. Create indexes for frequently queried fields
+2. Use pagination for large result sets
+3. Project only needed fields
+4. Batch write operations
+5. Monitor collection sizes
+6. Compact when dead ratio is high
+7. Archive old data periodically

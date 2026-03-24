@@ -1,0 +1,104 @@
+---
+title: Installation
+description: Install Toolless and set up your first database
+---
+
+## Package Installation
+
+Install Toolless using your preferred package manager:
+
+```bash title="npm"
+npm install toolless
+```
+
+```bash title="pnpm"
+pnpm add toolless
+```
+
+```bash title="yarn"
+yarn add toolless
+```
+
+<Callout type="info" title="TypeScript Support">
+  Toolless includes TypeScript definitions out of the box. No additional `@types` packages required.
+</Callout>
+
+## Global CLI Installation
+
+For command-line access from anywhere:
+
+```bash title="Terminal"
+npm install -g toolless
+```
+
+Verify the installation:
+
+```bash title="Terminal"
+toolless --version
+```
+
+## Quick Verification
+
+Create a simple test to verify everything works:
+
+```typescript title="test.ts"
+import { createClient } from "toolless";
+
+const client = createClient({ path: "./test-data" });
+const db = client.db("test");
+const items = db.collection("items");
+
+await items.insertOne({ name: "Test Item", created: new Date().toISOString() });
+const result = await items.findOne({ name: "Test Item" });
+console.log(result);
+```
+
+Run with:
+
+```bash title="Terminal"
+npx tsx test.ts
+```
+
+## Project Setup
+
+For a new project:
+
+```bash title="Terminal"
+mkdir my-project && cd my-project
+npm init -y
+npm install toolless typescript tsx
+mkdir data
+```
+
+Create your database module:
+
+```typescript title="src/db.ts"
+import { createClient } from "toolless";
+
+const client = createClient({ path: "./data" });
+const db = client.db("myapp");
+
+export { client, db };
+```
+
+<Callout type="warn" title="Data Directory">
+  Make sure the data directory exists and has write permissions. Toolless will create database
+  folders inside this directory.
+</Callout>
+
+## From Source
+
+Clone and build from source:
+
+```bash title="Terminal"
+git clone https://github.com/habibthadev/toolless.git
+cd toolless
+pnpm install
+pnpm build
+```
+
+## Requirements
+
+- Node.js 18 or later
+- File system with read/write access
+- No external database servers required
