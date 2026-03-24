@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+pnpm-lock.yaml.backup
+
+# Build outputs
+dist/
+build/
+*.tdb/
+*.tdb
+.turbo/
+.output/
+.nitro/
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*.sublime-*
+.DS_Store
+Thumbs.db
+.vs/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Test artifacts
+.test-*
+coverage/
+*.lcov
+
+# Vercel outputs
+.vercel/
+
+# Temporary files
+.tmp
+*.tmp
+
+# Project-specific
+*.jpg
+*.png
+*.jpeg
+skills-lock.json
+.agents/
+
+# Generated files
+collections/
+.source/
+.tanstack/
+benchmarks/
+examples/
