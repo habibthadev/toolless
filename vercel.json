@@ -6,21 +6,21 @@
   "framework": null,
   "functions": {
     "apps/docs/dist/server/**/*.js": {
-      "runtime": "nodejs20.x"
+      "runtime": "nodejs20.x",
+      "memory": 1024
     }
   },
   "routes": [
     {
       "src": "/assets/(.*)",
-      "dest": "/client/assets/$1"
+      "dest": "/client/assets/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
     },
     {
-      "src": "/favicon.svg",
-      "dest": "/client/favicon.svg"
-    },
-    {
-      "src": "/og.svg",
-      "dest": "/client/og.svg"
+      "src": "/(favicon\\.svg|og\\.svg)",
+      "dest": "/client/$1"
     },
     {
       "src": "/(.*)",
