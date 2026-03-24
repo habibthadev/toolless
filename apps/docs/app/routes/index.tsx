@@ -80,7 +80,7 @@ function Header() {
             </a>
 
             <a
-              href="https://github.com/habibthadev/toolless"
+              href="https://github.com/habibthadev/toollessdb"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex h-10 w-10 items-center justify-center rounded-lg text-fd-muted-foreground transition-all hover:bg-fd-accent hover:text-fd-foreground hover:scale-110"

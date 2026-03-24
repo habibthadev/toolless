@@ -14,7 +14,7 @@ export function baseOptions(): BaseLayoutProps {
     links: [
       {
         text: "GitHub",
-        url: "https://github.com/habibthadev/toolless",
+        url: "https://github.com/habibthadev/toollessdb",
         external: true,
       },
     ],
