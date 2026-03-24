@@ -51,7 +51,7 @@ jobs:
         id: version_changed
         run: |
           VERSION=${{ steps.changelog_version.outputs.version }}
-          if npm view toolless@$VERSION version 2>/dev/null; then
+          if npm view toollessdb@$VERSION version 2>/dev/null; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "Version $VERSION already published, skipping"
           else
