@@ -18,7 +18,7 @@ describe("Error Types", () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "toolless-error-test-"));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "toollessdb-error-test-"));
   });
 
   afterEach(() => {
@@ -26,7 +26,7 @@ describe("Error Types", () => {
   });
 
   describe("ToollessError base class", () => {
-    it("should be the base class for all toolless errors", () => {
+    it("should be the base class for all toollessdb errors", () => {
       const errors = [
         new DuplicateKeyError("_id", "test-id"),
         new ValidationError("test", []),

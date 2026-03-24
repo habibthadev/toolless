@@ -1,5 +1,5 @@
 {
-  "name": "toolless-monorepo",
+  "name": "toollessdb-monorepo",
   "private": true,
   "type": "module",
   "scripts": {

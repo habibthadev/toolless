@@ -49,7 +49,7 @@ pnpm start
 ## Tech Stack
 
 - **Framework**: [Hono](https://hono.dev/) - Ultrafast web framework
-- **Database**: [Toolless](../../packages/toolless) - File-based document database
+- **Database**: [Toolless](../../packages/toollessdb) - File-based document database
 - **Authentication**: bcryptjs for password hashing
 - **ID Generation**: nanoid for short codes
 - **UI**: Custom Vercel-inspired design system

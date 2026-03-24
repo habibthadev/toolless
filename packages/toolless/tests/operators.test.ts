@@ -8,7 +8,7 @@ describe("Operators", () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "toolless-operators-test-"));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "toollessdb-operators-test-"));
   });
 
   afterEach(() => {

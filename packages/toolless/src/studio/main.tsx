@@ -10,7 +10,7 @@ import "./globals.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider defaultTheme="system" storageKey="toolless-studio-theme">
+    <ThemeProvider defaultTheme="system" storageKey="toollessdb-studio-theme">
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
