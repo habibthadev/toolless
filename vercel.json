@@ -1,0 +1,30 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm --filter docs build",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "outputDirectory": "apps/docs/dist",
+  "framework": null,
+  "functions": {
+    "apps/docs/dist/server/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/client/assets/$1"
+    },
+    {
+      "src": "/favicon.svg",
+      "dest": "/client/favicon.svg"
+    },
+    {
+      "src": "/og.svg",
+      "dest": "/client/og.svg"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/server/server.js"
+    }
+  ]
+}
