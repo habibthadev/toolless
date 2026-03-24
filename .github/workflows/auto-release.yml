@@ -1,4 +1,4 @@
-name: Auto Release
+name: Release
 
 on:
   push:
@@ -6,211 +6,122 @@ on:
       - main
     paths:
       - "CHANGELOG.md"
-  workflow_dispatch:
-    inputs:
-      dry_run:
-        description: "Dry run (skip publish)"
-        required: false
-        default: "false"
-        type: choice
-        options:
-          - "true"
-          - "false"
 
-concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
+permissions:
+  contents: write
+  id-token: write
 
 jobs:
-  auto-release:
+  release:
+    name: Sync version and publish to npm
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Extract latest version from CHANGELOG
-        id: changelog
-        run: |
-          # Extract the latest version from CHANGELOG (first non-Unreleased version)
-          # More robust extraction using sed
-          CHANGELOG_VERSION=$(sed -n 's/^## \[\([0-9]*\.[0-9]*\.[0-9]*[^]]*\)\].*/\1/p' CHANGELOG.md | head -1)
-
-          if [ -z "$CHANGELOG_VERSION" ]; then
-            echo "No version found in CHANGELOG.md"
-            exit 1
-          fi
-
-          echo "changelog_version=$CHANGELOG_VERSION" >> $GITHUB_OUTPUT
-          echo "Latest CHANGELOG version: $CHANGELOG_VERSION"
-
-          # Extract release notes for this version (everything between this version header and next version header)
-          awk '/^## \['"$CHANGELOG_VERSION"'\]/{flag=1; next} /^## \[/{flag=0} flag' CHANGELOG.md > release-notes.md
-
-          # Check if release notes are empty
-          if [ ! -s release-notes.md ]; then
-            echo "No release notes found for version $CHANGELOG_VERSION"
-            echo "See [CHANGELOG.md](CHANGELOG.md) for details." > release-notes.md
-          fi
-
-          # Check if git tag already exists
-          if git rev-parse "v$CHANGELOG_VERSION" >/dev/null 2>&1; then
-            echo "Git tag v$CHANGELOG_VERSION already exists"
-            echo "tag_exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "tag_exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Check if npm version exists
-        id: npm_check
-        run: |
-          VERSION="${{ steps.changelog.outputs.changelog_version }}"
-          # Check if package version exists on npm
-          if npm view toolless@$VERSION version 2>/dev/null; then
-            echo "npm_exists=true" >> $GITHUB_OUTPUT
-            echo "Version $VERSION already published to npm"
-          else
-            echo "npm_exists=false" >> $GITHUB_OUTPUT
-            echo "Version $VERSION not found on npm"
-          fi
-
-      - name: Determine if release is needed
-        id: should_release
-        run: |
-          TAG_EXISTS="${{ steps.changelog.outputs.tag_exists }}"
-          NPM_EXISTS="${{ steps.npm_check.outputs.npm_exists }}"
-
-          if [ "$TAG_EXISTS" = "true" ] && [ "$NPM_EXISTS" = "true" ]; then
-            echo "should_release=false" >> $GITHUB_OUTPUT
-            echo "Skipping release: tag and npm package already exist"
-          else
-            echo "should_release=true" >> $GITHUB_OUTPUT
-            echo "Proceeding with release"
-          fi
-
-      - name: Get package.json version
-        id: package
-        if: steps.should_release.outputs.should_release == 'true'
-        run: |
-          PACKAGE_VERSION=$(node -p "require('./packages/toolless/package.json').version")
-          echo "package_version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
-          echo "Package version: $PACKAGE_VERSION"
-
-      - name: Update package.json if needed
-        if: steps.should_release.outputs.should_release == 'true'
-        run: |
-          CHANGELOG_VERSION="${{ steps.changelog.outputs.changelog_version }}"
-          PACKAGE_VERSION="${{ steps.package.outputs.package_version }}"
-
-          if [ "$CHANGELOG_VERSION" != "$PACKAGE_VERSION" ]; then
-            echo "Updating package.json from $PACKAGE_VERSION to $CHANGELOG_VERSION"
-
-            # Update version in package.json
-            cd packages/toolless
-            npm version "$CHANGELOG_VERSION" --no-git-tag-version
-            cd ../..
-
-            # Commit the change
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add packages/toolless/package.json
-            git commit -m "chore(release): bump version to $CHANGELOG_VERSION"
-            git push
-          else
-            echo "Package version already matches CHANGELOG version"
-          fi
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
-        if: steps.should_release.outputs.should_release == 'true'
         run: pnpm install --frozen-lockfile
 
+      - name: Extract version from CHANGELOG
+        id: changelog_version
+        run: |
+          VERSION=$(grep -m1 '## \[[0-9]' CHANGELOG.md | sed 's/## \[\(.*\)\].*/\1/')
+          if [ -z "$VERSION" ]; then
+            echo "Could not extract version from CHANGELOG.md"
+            exit 1
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Check if version exists on npm
+        id: version_changed
+        run: |
+          VERSION=${{ steps.changelog_version.outputs.version }}
+          if npm view toolless@$VERSION version 2>/dev/null; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Version $VERSION already published, skipping"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Version $VERSION not on npm, will publish"
+          fi
+
+      - name: Configure git
+        if: steps.version_changed.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync package.json version
+        if: steps.version_changed.outputs.changed == 'true'
+        run: |
+          VERSION=${{ steps.changelog_version.outputs.version }}
+          CURRENT=$(node -p "require('./packages/toolless/package.json').version")
+          if [ "$VERSION" != "$CURRENT" ]; then
+            cd packages/toolless
+            node -e "
+              const fs = require('fs');
+              const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+              pkg.version = '$VERSION';
+              fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+            "
+            cd ../..
+            git add packages/toolless/package.json
+            git commit -m "chore: release v$VERSION [skip ci]"
+            git push origin main
+          else
+            echo "package.json already at $VERSION, skipping commit"
+          fi
+
       - name: Type check
-        if: steps.should_release.outputs.should_release == 'true'
+        if: steps.version_changed.outputs.changed == 'true'
         run: pnpm --filter toolless typecheck
 
       - name: Lint
-        if: steps.should_release.outputs.should_release == 'true'
+        if: steps.version_changed.outputs.changed == 'true'
         run: pnpm lint
 
       - name: Build
-        if: steps.should_release.outputs.should_release == 'true'
+        if: steps.version_changed.outputs.changed == 'true'
         run: pnpm build
 
       - name: Test
-        if: steps.should_release.outputs.should_release == 'true'
+        if: steps.version_changed.outputs.changed == 'true'
         run: pnpm test
 
-      - name: Verify dist folder
-        if: steps.should_release.outputs.should_release == 'true'
+      - name: Tag release
+        if: steps.version_changed.outputs.changed == 'true'
         run: |
-          # Ensure dist folder exists and has expected files
-          if [ ! -d "packages/toolless/dist" ]; then
-            echo "Error: dist folder not found!"
-            exit 1
-          fi
-
-          # Check for required files
-          required_files=("index.js" "index.cjs" "index.d.ts" "cli.js")
-          for file in "${required_files[@]}"; do
-            if [ ! -f "packages/toolless/dist/$file" ]; then
-              echo "Error: Required file $file not found in dist!"
-              exit 1
-            fi
-          done
-
-          echo "Dist folder verification passed"
-          ls -la packages/toolless/dist/
-
-      - name: Create Git Tag
-        if: steps.should_release.outputs.should_release == 'true' && steps.changelog.outputs.tag_exists == 'false'
-        run: |
-          VERSION="${{ steps.changelog.outputs.changelog_version }}"
+          VERSION=${{ steps.changelog_version.outputs.version }}
           git tag "v$VERSION"
           git push origin "v$VERSION"
 
-      - name: Create GitHub Release
-        if: steps.should_release.outputs.should_release == 'true' && steps.changelog.outputs.tag_exists == 'false'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.changelog.outputs.changelog_version }}
-          name: v${{ steps.changelog.outputs.changelog_version }}
-          body_path: release-notes.md
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Publish to npm
-        if: steps.should_release.outputs.should_release == 'true' && steps.npm_check.outputs.npm_exists == 'false' && (github.event_name != 'workflow_dispatch' || inputs.dry_run != 'true')
+        if: steps.version_changed.outputs.changed == 'true'
         working-directory: packages/toolless
-        run: npm publish --provenance --access public
+        run: pnpm publish --no-git-checks --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Summary
-        run: |
-          echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version**: ${{ steps.changelog.outputs.changelog_version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tag Existed**: ${{ steps.changelog.outputs.tag_exists }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **NPM Existed**: ${{ steps.npm_check.outputs.npm_exists }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Release Needed**: ${{ steps.should_release.outputs.should_release }}" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
-            echo "- **Mode**: Dry Run (npm publish skipped)" >> $GITHUB_STEP_SUMMARY
-          fi
+      - name: Create GitHub release
+        if: steps.version_changed.outputs.changed == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.changelog_version.outputs.version }}
+          name: v${{ steps.changelog_version.outputs.version }}
+          body: |
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+          generate_release_notes: false
