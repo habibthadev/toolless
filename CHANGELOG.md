@@ -60,7 +60,7 @@ Initial release of Toollessdb - a file-based document database for Node.js.
   - Document creation, editing, and deletion
   - Visual JSON editor with syntax validation
   - Dark and light mode support
-  - Responsive design for all screen sizes
+  - Responsive design for all screen sizes (mobile -> desktop)
 
 - **Error Handling**
   - Typed error classes: ToollessError, LockError, DuplicateKeyError, ValidationError, ImmutableFieldError, CollectionDroppedError, CorruptFileError

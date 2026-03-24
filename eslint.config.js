@@ -121,6 +121,7 @@ export default [
       "**/.agents/**",
       "**/.source/**",
       "**/.output/**",
+      "**/.vercel/**",
     ],
   },
 ];
