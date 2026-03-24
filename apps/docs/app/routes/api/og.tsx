@@ -68,7 +68,7 @@ export const Route = createFileRoute("/api/og")({
                   letterSpacing: -0.3,
                 }}
               >
-                toollessdb.dev
+                toolless.dev
               </div>
             </div>
 

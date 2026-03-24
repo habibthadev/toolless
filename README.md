@@ -5,7 +5,7 @@ A file-based, document-oriented database for Node.js with MongoDB-compatible API
 [![npm version](https://img.shields.io/npm/v/toollessdb.svg)](https://www.npmjs.com/package/toollessdb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-**Documentation**: [toollessdb.dev](https://toollessdb.dev)
+**Documentation**: [toolless.dev](https://toolless.dev)
 
 **GitHub**: [github.com/habibthadev/toolless](https://github.com/habibthadev/toolless)
 

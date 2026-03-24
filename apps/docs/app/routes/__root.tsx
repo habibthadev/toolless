@@ -17,7 +17,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const ogImage =
-    "https://toollessdb.dev/api/og?title=Toolless&description=File-based%20document%20database%20for%20Node.js%20with%20a%20MongoDB-compatible%20API";
+    "https://toolless.dev/api/og?title=Toolless&description=File-based%20document%20database%20for%20Node.js%20with%20a%20MongoDB-compatible%20API";
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -46,7 +46,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           property="og:description"
           content="A file-based document database for Node.js with a MongoDB-compatible API."
         />
-        <meta property="og:url" content="https://toollessdb.dev" />
+        <meta property="og:url" content="https://toolless.dev" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:type" content="image/png" />

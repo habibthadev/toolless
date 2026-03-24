@@ -22,7 +22,7 @@
   "bugs": {
     "url": "https://github.com/habibthadev/toolless/issues"
   },
-  "homepage": "https://toollessdb.dev",
+  "homepage": "https://toolless.dev",
   "bin": {
     "toollessdb": "./dist/cli.js"
   },
