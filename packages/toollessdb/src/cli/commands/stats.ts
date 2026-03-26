@@ -3,7 +3,14 @@ import * as path from "node:path";
 import * as fs from "node:fs";
 import { createClient } from "../../index";
 import Table from "cli-table3";
-import { colors, formatBytes, formatCount, printError } from "../utils";
+import {
+  colors,
+  formatBytes,
+  formatCount,
+  printError,
+  resolveDatabase,
+  getDefaultBasePath,
+} from "../utils";
 
 export function registerStatsCommand(program: Command): void {
   program
@@ -13,9 +20,10 @@ export function registerStatsCommand(program: Command): void {
     .option("--json", "Output as JSON")
     .action(async (database: string | undefined, collection: string | undefined, options) => {
       try {
-        const basePath = path.resolve(options.path);
-
         if (!database) {
+          // Show overall stats - use auto-discovery
+          const basePath = options.path === "." ? getDefaultBasePath() : path.resolve(options.path);
+
           const entries = fs.readdirSync(basePath, { withFileTypes: true });
           const databases = entries
             .filter((e) => e.isDirectory() && e.name.endsWith(".tdb"))
@@ -58,9 +66,17 @@ export function registerStatsCommand(program: Command): void {
           return;
         }
 
+        const resolved = resolveDatabase(database, options.path);
+
+        if (!resolved) {
+          printError(`Database "${database}" not found`);
+          process.exit(1);
+        }
+
+        const { basePath, dbName } = resolved;
         const client = createClient({ path: basePath });
-        const db = client.db(database);
-        const dbPath = path.join(basePath, `${database}.tdb`);
+        const db = client.db(dbName);
+        const dbPath = path.join(basePath, `${dbName}.tdb`);
 
         if (collection) {
           const coll = db.collection(collection);
@@ -116,7 +132,7 @@ export function registerStatsCommand(program: Command): void {
           }
 
           const stats = {
-            database,
+            database: dbName,
             collections: collections.length,
             documents: totalDocs,
             totalSize,
@@ -128,7 +144,7 @@ export function registerStatsCommand(program: Command): void {
             console.log(JSON.stringify(stats, null, 2));
           } else {
             console.log("");
-            console.log(colors.bold(`  Database: ${database}`));
+            console.log(colors.bold(`  Database: ${dbName}`));
             console.log("");
             console.log(`  ${colors.dim("Collections:")} ${collections.length}`);
             console.log(`  ${colors.dim("Documents:")}   ${formatCount(totalDocs)}`);

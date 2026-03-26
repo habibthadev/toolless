@@ -3,7 +3,7 @@ import * as path from "node:path";
 import * as fs from "node:fs";
 import { createClient } from "../../index";
 import ora from "ora";
-import { printError, printSuccess, formatBytes } from "../utils";
+import { printError, printSuccess, formatBytes, resolveDatabase } from "../utils";
 
 export function registerCompactCommand(program: Command): void {
   program
@@ -12,15 +12,22 @@ export function registerCompactCommand(program: Command): void {
     .option("-p, --path <path>", "Path to database directory", ".")
     .action(async (database: string, collection: string | undefined, options) => {
       try {
-        const basePath = path.resolve(options.path);
+        const resolved = resolveDatabase(database, options.path);
+
+        if (!resolved) {
+          printError(`Database "${database}" not found`);
+          process.exit(1);
+        }
+
+        const { basePath, dbName } = resolved;
         const client = createClient({ path: basePath });
-        const db = client.db(database);
+        const db = client.db(dbName);
 
         const collections = collection ? [collection] : await db.listCollections();
 
         for (const name of collections) {
           const spinner = ora(`Compacting ${name}...`).start();
-          const filePath = path.join(basePath, `${database}.tdb`, `${name}.tdb`);
+          const filePath = path.join(basePath, `${dbName}.tdb`, `${name}.tdb`);
           const sizeBefore = fs.existsSync(filePath) ? fs.statSync(filePath).size : 0;
 
           const coll = db.collection(name);
@@ -50,9 +57,16 @@ export function registerDropCommand(program: Command): void {
     .option("-f, --force", "Skip confirmation")
     .action(async (database: string, collection: string, options) => {
       try {
-        const basePath = path.resolve(options.path);
+        const resolved = resolveDatabase(database, options.path);
+
+        if (!resolved) {
+          printError(`Database "${database}" not found`);
+          process.exit(1);
+        }
+
+        const { basePath, dbName } = resolved;
         const client = createClient({ path: basePath });
-        const db = client.db(database);
+        const db = client.db(dbName);
 
         const dropped = await db.dropCollection(collection);
 
@@ -79,9 +93,16 @@ export function registerExportCommand(program: Command): void {
     .option("--pretty", "Pretty print JSON")
     .action(async (database: string, collection: string, options) => {
       try {
-        const basePath = path.resolve(options.path);
+        const resolved = resolveDatabase(database, options.path);
+
+        if (!resolved) {
+          printError(`Database "${database}" not found`);
+          process.exit(1);
+        }
+
+        const { basePath, dbName } = resolved;
         const client = createClient({ path: basePath });
-        const db = client.db(database);
+        const db = client.db(dbName);
         const coll = db.collection(collection);
 
         const docs = await coll.find({}).toArray();
@@ -110,9 +131,12 @@ export function registerImportCommand(program: Command): void {
     .option("--drop", "Drop collection before import")
     .action(async (database: string, collection: string, file: string, options) => {
       try {
-        const basePath = path.resolve(options.path);
+        const resolved = resolveDatabase(database, options.path);
+        const basePath = resolved?.basePath ?? options.path;
+        const dbName = resolved?.dbName ?? database;
+
         const client = createClient({ path: basePath });
-        const db = client.db(database);
+        const db = client.db(dbName);
 
         if (options.drop) {
           await db.dropCollection(collection);

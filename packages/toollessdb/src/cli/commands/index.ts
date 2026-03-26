@@ -1,8 +1,7 @@
 import { Command } from "commander";
-import * as path from "node:path";
 import { createClient } from "../../index";
 import Table from "cli-table3";
-import { colors, formatJson, printError, printSuccess } from "../utils";
+import { colors, formatJson, printError, printSuccess, resolveDatabase } from "../utils";
 
 export function registerIndexCommand(program: Command): void {
   const indexCmd = program.command("index").description("Manage collection indexes");
@@ -14,9 +13,16 @@ export function registerIndexCommand(program: Command): void {
     .option("--json", "Output as JSON")
     .action(async (database: string, collection: string, options) => {
       try {
-        const basePath = path.resolve(options.path);
+        const resolved = resolveDatabase(database, options.path);
+
+        if (!resolved) {
+          printError(`Database "${database}" not found`);
+          process.exit(1);
+        }
+
+        const { basePath, dbName } = resolved;
         const client = createClient({ path: basePath });
-        const db = client.db(database);
+        const db = client.db(dbName);
         const coll = db.collection(collection);
 
         const indexes = await coll.listIndexes();
@@ -61,9 +67,12 @@ export function registerIndexCommand(program: Command): void {
     .option("-u, --unique", "Unique index")
     .action(async (database: string, collection: string, specStr: string, options) => {
       try {
-        const basePath = path.resolve(options.path);
+        const resolved = resolveDatabase(database, options.path);
+        const basePath = resolved?.basePath ?? options.path;
+        const dbName = resolved?.dbName ?? database;
+
         const client = createClient({ path: basePath });
-        const db = client.db(database);
+        const db = client.db(dbName);
         const coll = db.collection(collection);
 
         const spec = JSON.parse(specStr);
@@ -88,9 +97,16 @@ export function registerIndexCommand(program: Command): void {
     .option("-p, --path <path>", "Path to database directory", ".")
     .action(async (database: string, collection: string, name: string, options) => {
       try {
-        const basePath = path.resolve(options.path);
+        const resolved = resolveDatabase(database, options.path);
+
+        if (!resolved) {
+          printError(`Database "${database}" not found`);
+          process.exit(1);
+        }
+
+        const { basePath, dbName } = resolved;
         const client = createClient({ path: basePath });
-        const db = client.db(database);
+        const db = client.db(dbName);
         const coll = db.collection(collection);
 
         const dropped = await coll.dropIndex(name);

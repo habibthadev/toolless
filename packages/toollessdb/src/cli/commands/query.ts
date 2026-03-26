@@ -1,8 +1,7 @@
 import { Command } from "commander";
-import * as path from "node:path";
 import { createClient } from "../../index";
 import Table from "cli-table3";
-import { colors, formatJson, printError, truncate, databaseExists } from "../utils";
+import { colors, formatJson, printError, truncate, resolveDatabase } from "../utils";
 
 export function registerQueryCommand(program: Command): void {
   program
@@ -19,15 +18,16 @@ export function registerQueryCommand(program: Command): void {
     .option("--count", "Only show count")
     .action(async (database: string, collection: string, options) => {
       try {
-        const basePath = path.resolve(options.path);
+        const resolved = resolveDatabase(database, options.path);
 
-        if (!databaseExists(basePath, database)) {
-          printError(`Database "${database}" not found in ${basePath}`);
+        if (!resolved) {
+          printError(`Database "${database}" not found`);
           process.exit(1);
         }
 
+        const { basePath, dbName } = resolved;
         const client = createClient({ path: basePath });
-        const db = client.db(database);
+        const db = client.db(dbName);
         const coll = db.collection(collection);
 
         const filter = JSON.parse(options.filter);

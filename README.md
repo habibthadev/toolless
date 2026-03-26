@@ -275,7 +275,19 @@ await coll.compact();
 
 ## CLI Reference
 
+The CLI auto-discovers databases in the `./data` folder. You can also specify database paths directly:
+
 ```bash
+# Auto-discovery: finds testdb in ./data folder
+toollessdb query testdb users
+
+# Direct path: specify database location
+toollessdb query data/testdb users
+toollessdb query ./mydata/testdb users
+
+# Explicit path option
+toollessdb query testdb users -p ./mydata
+
 # List databases
 toollessdb list
 

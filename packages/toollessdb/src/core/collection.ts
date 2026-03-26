@@ -25,6 +25,7 @@ import { IndexManager } from "./storage/index";
 import {
   replayLog,
   appendToFile,
+  appendBatchToFile,
   createInsertRecord,
   createUpdateRecord,
   createDeleteRecord,
@@ -165,6 +166,9 @@ export class Collection<T extends Record<string, unknown> = Record<string, unkno
 
     return this.writeQueue.enqueue(async () => {
       const insertedIds: string[] = [];
+      const records: ReturnType<typeof createInsertRecord>[] = [];
+      const docsToInsert: Document[] = [];
+      const seenIds = new Set<string>();
 
       for (const doc of docs) {
         const id = doc._id ?? generateObjectId();
@@ -173,20 +177,25 @@ export class Collection<T extends Record<string, unknown> = Record<string, unkno
         const validated = this.validate(this.excludeId(baseDoc));
         const docWithId: Document = { ...validated, _id: id } as Document;
 
-        if (this.documents.has(id)) {
+        if (this.documents.has(id) || seenIds.has(id)) {
           throw new DuplicateKeyError("_id", id);
         }
+        seenIds.add(id);
 
         this.indexManager.validateInsert(docWithId);
 
-        const record = createInsertRecord(docWithId);
-        appendToFile(this.filePath, record);
+        records.push(createInsertRecord(docWithId));
+        docsToInsert.push(docWithId);
+        insertedIds.push(id);
+      }
 
-        this.documents.set(id, docWithId);
+      appendBatchToFile(this.filePath, records);
+
+      for (const docWithId of docsToInsert) {
+        this.documents.set(docWithId._id, docWithId);
         this.indexManager.addDocument(docWithId);
         this.totalOps++;
         this.liveOps++;
-        insertedIds.push(id);
       }
 
       await this.maybeCompact();
@@ -197,6 +206,16 @@ export class Collection<T extends Record<string, unknown> = Record<string, unkno
 
   async findOne(filter: Filter<T>, _options?: FindOptions): Promise<WithId<T> | null> {
     this.ensureLoaded();
+
+    // Fast path: direct _id lookup
+    if (
+      filter._id !== undefined &&
+      typeof filter._id === "string" &&
+      Object.keys(filter).length === 1
+    ) {
+      const doc = this.documents.get(filter._id);
+      return doc !== undefined ? (doc as WithId<T>) : null;
+    }
 
     for (const doc of this.documents.values()) {
       if (matchFilter(doc, filter)) {

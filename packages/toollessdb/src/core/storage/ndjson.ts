@@ -31,18 +31,22 @@ export function replayLog(filePath: string): {
   }
 
   const content = fs.readFileSync(filePath, "utf-8");
-  const lines = content.split("\n");
+  let start = 0;
+  const len = content.length;
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (line === undefined) continue;
+  while (start < len) {
+    let end = content.indexOf("\n", start);
+    if (end === -1) end = len;
 
-    const record = parseNdjsonLine(line);
+    const line = content.slice(start, end);
+    start = end + 1;
 
-    if (record === null) {
-      if (i === lines.length - 1 && line.trim() !== "") {
-        continue;
-      }
+    if (line === "" || line.charCodeAt(0) <= 32) continue;
+
+    let record: OperationRecord | CollectionHeader;
+    try {
+      record = JSON.parse(line);
+    } catch {
       continue;
     }
 
@@ -123,6 +127,22 @@ export function appendToFile(filePath: string, record: OperationRecord | Collect
   const fd = fs.openSync(filePath, "a");
   try {
     fs.writeSync(fd, line);
+    fs.fdatasyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+export function appendBatchToFile(
+  filePath: string,
+  records: Array<OperationRecord | CollectionHeader>
+): void {
+  if (records.length === 0) return;
+
+  const lines = records.map((record) => JSON.stringify(record)).join("\n") + "\n";
+  const fd = fs.openSync(filePath, "a");
+  try {
+    fs.writeSync(fd, lines);
     fs.fdatasyncSync(fd);
   } finally {
     fs.closeSync(fd);

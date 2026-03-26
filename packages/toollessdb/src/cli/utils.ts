@@ -12,6 +12,59 @@ export const colors = {
   muted: chalk.gray,
 };
 
+export function resolveDatabase(
+  database: string,
+  pathOption: string
+): { basePath: string; dbName: string } | null {
+  // First, check if database is a path (contains / or ends with .tdb)
+  if (database.includes("/") || database.includes("\\") || database.endsWith(".tdb")) {
+    let dbPath = database;
+    // Normalize: remove trailing .tdb if present
+    if (dbPath.endsWith(".tdb")) {
+      dbPath = dbPath.slice(0, -4);
+    }
+
+    const fullPath = path.resolve(dbPath + ".tdb");
+    if (fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
+      return {
+        basePath: path.dirname(fullPath),
+        dbName: path.basename(dbPath),
+      };
+    }
+  }
+
+  // Second, check explicit path option
+  const basePath = path.resolve(pathOption);
+  const dbPath = path.join(basePath, `${database}.tdb`);
+  if (fs.existsSync(dbPath) && fs.statSync(dbPath).isDirectory()) {
+    return { basePath, dbName: database };
+  }
+
+  // Third, try ./data folder auto-discovery
+  if (pathOption === ".") {
+    const dataPath = path.resolve("data");
+    const dataDbPath = path.join(dataPath, `${database}.tdb`);
+    if (fs.existsSync(dataDbPath) && fs.statSync(dataDbPath).isDirectory()) {
+      return { basePath: dataPath, dbName: database };
+    }
+  }
+
+  return null;
+}
+
+export function getDefaultBasePath(): string {
+  // Check if ./data exists and has .tdb databases
+  const dataPath = path.resolve("data");
+  if (fs.existsSync(dataPath) && fs.statSync(dataPath).isDirectory()) {
+    const entries = fs.readdirSync(dataPath, { withFileTypes: true });
+    const hasDatabases = entries.some((e) => e.isDirectory() && e.name.endsWith(".tdb"));
+    if (hasDatabases) {
+      return dataPath;
+    }
+  }
+  return path.resolve(".");
+}
+
 export function databaseExists(basePath: string, dbName: string): boolean {
   const dbPath = path.join(basePath, `${dbName}.tdb`);
   return fs.existsSync(dbPath) && fs.statSync(dbPath).isDirectory();

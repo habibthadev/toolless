@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-03-26
+
+### Changed
+
+- **Performance: Batched insertMany writes** - Bulk inserts now batch all records into a single disk write+sync instead of one per document, improving insertMany throughput by ~15x
+- **Performance: Optimized findOne by \_id** - Direct Map lookup when querying solely by `_id` field, bypassing filter matching
+- **Performance: Faster NDJSON parsing** - Replaced `split("\n")` with indexed string scanning to reduce memory allocation during cold start
+
+### Fixed
+
+- **CLI: Smart database path resolution** - CLI commands now auto-discover databases in `./data` folder and accept database paths directly (e.g., `data/testdb` or `./mydata/testdb.tdb`)
+
 ## [1.0.0] - 2026-03-24
 
 Initial release of Toollessdb - a file-based document database for Node.js.
@@ -80,5 +92,6 @@ Initial release of Toollessdb - a file-based document database for Node.js.
 - Storage format specification
 - Performance guidelines
 
-[Unreleased]: https://github.com/habibthadev/toolless/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/habibthadev/toolless/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/habibthadev/toolless/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/habibthadev/toolless/releases/tag/v1.0.0
