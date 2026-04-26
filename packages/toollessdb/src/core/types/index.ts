@@ -139,11 +139,12 @@ export type Update<T> = {
 };
 
 export interface OperationRecord {
-  op: "insert" | "update" | "delete";
+  op: "insert" | "update" | "delete" | "replace";
   _id: string;
   ts: number;
   doc?: Document;
   delta?: Record<string, unknown>;
+  deleted?: string[];
 }
 
 export interface CollectionHeader {

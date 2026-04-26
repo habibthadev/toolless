@@ -275,20 +275,17 @@ await coll.compact();
 
 ## CLI Reference
 
-The CLI auto-discovers databases in the `./data` folder. You can also specify database paths directly:
+The CLI uses `./data` as the fixed database directory — always relative to your current working directory. **Run all CLI commands from your project root** where `./data` is located.
 
 ```bash
-# Auto-discovery: finds testdb in ./data folder
-toollessdb query testdb users
+# Default: looks for databases in ./data (from your project root)
+toollessdb query mydb users
 
-# Direct path: specify database location
-toollessdb query data/testdb users
-toollessdb query ./mydata/testdb users
+# Custom path (when your data lives elsewhere)
+toollessdb query mydb users -p ./mydata
+toollessdb query mydb users -p /absolute/path/to/data
 
-# Explicit path option
-toollessdb query testdb users -p ./mydata
-
-# List databases
+# List databases in ./data
 toollessdb list
 
 # List collections in a database
@@ -299,7 +296,7 @@ toollessdb query mydb users
 toollessdb query mydb users -f '{"age": {"$gte": 18}}'
 toollessdb query mydb users --sort '{"createdAt": -1}' --limit 10
 
-# Insert a document
+# Insert a document (creates ./data/mydb if it doesn't exist)
 toollessdb insert mydb users '{"name": "Alice", "age": 30}'
 
 # Update documents
@@ -336,10 +333,12 @@ toollessdb stats mydb users
 toollessdb shell
 toollessdb shell -d mydb
 
-# Start Studio web interface
+# Start Studio web interface (requires ./data to exist)
 toollessdb studio
 toollessdb studio --port 3000
 ```
+
+> **Important:** The CLI does **not** walk up directories or use config files to find databases. Always run commands from the directory containing `./data`, or pass `-p <path>` to specify a custom location.
 
 ### Shell Commands
 
@@ -357,10 +356,12 @@ toollessdb studio --port 3000
 
 ## Studio
 
-Start the web-based data browser:
+Start the web-based data browser (run from your project root where `./data` exists):
 
 ```bash
-toollessdb studio
+toollessdb studio               # serves ./data on port 4000
+toollessdb studio --port 3000  # custom port
+toollessdb studio -p ./mydata  # custom data directory
 ```
 
 Open http://localhost:4000 to:

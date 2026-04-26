@@ -1,4 +1,5 @@
 import { Command } from "commander";
+import * as path from "node:path";
 import { createClient } from "../../index";
 import { printError, printSuccess, formatJson, resolveDatabase } from "../utils";
 
@@ -7,12 +8,12 @@ export function registerInsertCommand(program: Command): void {
     .command("insert <database> <collection> <document>")
     .alias("i")
     .description("Insert a document into a collection")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .option("--json", "Output result as JSON")
     .action(async (database: string, collection: string, document: string, options) => {
       try {
         const resolved = resolveDatabase(database, options.path);
-        const basePath = resolved?.basePath ?? options.path;
+        const basePath = resolved?.basePath ?? path.resolve(options.path);
         const dbName = resolved?.dbName ?? database;
 
         const client = createClient({ path: basePath });
@@ -50,7 +51,7 @@ export function registerUpdateCommand(program: Command): void {
     .command("update <database> <collection> <filter> <update>")
     .alias("u")
     .description("Update documents in a collection")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .option("--many", "Update all matching documents")
     .option("--upsert", "Create document if not found")
     .option("--json", "Output result as JSON")
@@ -106,7 +107,7 @@ export function registerDeleteCommand(program: Command): void {
     .command("delete <database> <collection> <filter>")
     .alias("d")
     .description("Delete documents from a collection")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .option("--many", "Delete all matching documents")
     .option("--json", "Output result as JSON")
     .action(async (database: string, collection: string, filterStr: string, options) => {

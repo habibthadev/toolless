@@ -35,10 +35,28 @@ npm install -g toollessdb
 
 All commands support these options:
 
-| Option       | Description                | Default                 |
-| ------------ | -------------------------- | ----------------------- |
-| `-p, --path` | Path to database directory | `.` (current directory) |
-| `--help`     | Show command help          | -                       |
+| Option       | Description                | Default  |
+| ------------ | -------------------------- | -------- |
+| `-p, --path` | Path to database directory | `./data` |
+| `--help`     | Show command help          | -        |
+
+## Database Directory
+
+The CLI uses `./data` as the default database directory — always relative to your **current working directory**. This is a fixed convention with no configuration file needed.
+
+```bash title="Terminal"
+# Run from your project root (where ./data lives)
+toollessdb list           # lists databases in ./data
+toollessdb query mydb users   # reads from ./data/mydb
+
+# Override with --path for a custom location
+toollessdb query mydb users -p /custom/path
+```
+
+<Callout type="warn">
+  Always run CLI commands from the directory that contains your `./data` folder. The CLI does
+  **not** walk up parent directories to find databases.
+</Callout>
 
 ## Quick Examples
 

@@ -7,7 +7,7 @@ description: Delete command reference
 
 ```bash title="delete.sh"
 toollessdb delete <database> <collection> <filter>
-  --path <path>        Path to database directory (default: ".")
+  --path <path>        Path to database directory (default: ./data)
   --many               Delete all matching documents
   --json               Output result as JSON
 ```
@@ -16,11 +16,11 @@ toollessdb delete <database> <collection> <filter>
 
 ## Options
 
-| Option          | Description                   | Default |
-| --------------- | ----------------------------- | ------- |
-| `--path <path>` | Path to database directory    | `"."`   |
-| `--many`        | Delete all matching documents | -       |
-| `--json`        | Output result as JSON         | -       |
+| Option          | Description                   | Default  |
+| --------------- | ----------------------------- | -------- |
+| `--path <path>` | Path to database directory    | `./data` |
+| `--many`        | Delete all matching documents | -        |
+| `--json`        | Output result as JSON         | -        |
 
 ## Arguments
 

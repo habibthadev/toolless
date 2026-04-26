@@ -3,26 +3,18 @@ import * as path from "node:path";
 import * as fs from "node:fs";
 import { createClient } from "../../index";
 import Table from "cli-table3";
-import {
-  colors,
-  formatBytes,
-  formatCount,
-  printError,
-  resolveDatabase,
-  getDefaultBasePath,
-} from "../utils";
+import { colors, formatBytes, formatCount, printError, resolveDatabase } from "../utils";
 
 export function registerStatsCommand(program: Command): void {
   program
     .command("stats [database] [collection]")
     .description("Show database or collection statistics")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .option("--json", "Output as JSON")
     .action(async (database: string | undefined, collection: string | undefined, options) => {
       try {
         if (!database) {
-          // Show overall stats - use auto-discovery
-          const basePath = options.path === "." ? getDefaultBasePath() : path.resolve(options.path);
+          const basePath = path.resolve(options.path);
 
           const entries = fs.readdirSync(basePath, { withFileTypes: true });
           const databases = entries

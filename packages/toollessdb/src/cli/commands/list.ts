@@ -3,26 +3,18 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { createClient } from "../../index";
 import Table from "cli-table3";
-import {
-  colors,
-  formatBytes,
-  formatCount,
-  printError,
-  resolveDatabase,
-  getDefaultBasePath,
-} from "../utils";
+import { colors, formatBytes, formatCount, printError, resolveDatabase } from "../utils";
 
 export function registerListCommand(program: Command): void {
   program
     .command("list [database]")
     .alias("ls")
     .description("List databases or collections")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .action(async (database: string | undefined, options: { path: string }) => {
       try {
         if (!database) {
-          // List all databases - use auto-discovery
-          const basePath = options.path === "." ? getDefaultBasePath() : path.resolve(options.path);
+          const basePath = path.resolve(options.path);
 
           const entries = fs.readdirSync(basePath, { withFileTypes: true });
           const databases = entries
@@ -55,7 +47,6 @@ export function registerListCommand(program: Command): void {
 
           console.log(table.toString());
         } else {
-          // List collections in a specific database
           const resolved = resolveDatabase(database, options.path);
 
           if (!resolved) {

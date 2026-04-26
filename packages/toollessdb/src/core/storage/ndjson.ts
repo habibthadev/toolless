@@ -70,7 +70,21 @@ export function replayLog(filePath: string): {
         if (opRecord.delta !== undefined) {
           const existing = documents.get(opRecord._id);
           if (existing !== undefined) {
-            documents.set(opRecord._id, { ...existing, ...opRecord.delta, _id: opRecord._id });
+            const merged = { ...existing, ...opRecord.delta, _id: opRecord._id };
+            if (opRecord.deleted !== undefined) {
+              for (const field of opRecord.deleted) {
+                delete (merged as Record<string, unknown>)[field];
+              }
+            }
+            documents.set(opRecord._id, merged);
+          }
+        }
+        break;
+
+      case "replace":
+        if (opRecord.doc !== undefined) {
+          if (documents.has(opRecord._id)) {
+            documents.set(opRecord._id, opRecord.doc);
           }
         }
         break;
@@ -105,12 +119,29 @@ export function createInsertRecord(doc: Document): OperationRecord {
   };
 }
 
-export function createUpdateRecord(id: string, delta: Record<string, unknown>): OperationRecord {
-  return {
+export function createUpdateRecord(
+  id: string,
+  delta: Record<string, unknown>,
+  deleted?: string[]
+): OperationRecord {
+  const record: OperationRecord = {
     op: "update",
     _id: id,
     ts: Date.now(),
     delta,
+  };
+  if (deleted !== undefined && deleted.length > 0) {
+    record.deleted = deleted;
+  }
+  return record;
+}
+
+export function createReplaceRecord(doc: Document): OperationRecord {
+  return {
+    op: "replace",
+    _id: doc._id,
+    ts: Date.now(),
+    doc,
   };
 }
 

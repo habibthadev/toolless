@@ -28,6 +28,7 @@ import {
   appendBatchToFile,
   createInsertRecord,
   createUpdateRecord,
+  createReplaceRecord,
   createDeleteRecord,
   ensureCollectionFile,
   compactCollection,
@@ -36,6 +37,16 @@ import {
 import { matchFilter } from "./query/filter";
 import { applyUpdate, applyReplacement } from "./query/update";
 import { Cursor } from "./query/cursor";
+
+function getNestedValue(obj: unknown, path: string): unknown {
+  const parts = path.split(".");
+  let current: unknown = obj;
+  for (const part of parts) {
+    if (current === null || current === undefined || typeof current !== "object") return undefined;
+    current = (current as Record<string, unknown>)[part];
+  }
+  return current;
+}
 
 export interface CollectionOptions<S extends z.ZodType | undefined = undefined> {
   schema?: S;
@@ -299,14 +310,14 @@ export class Collection<T extends Record<string, unknown> = Record<string, unkno
         return { matchedCount: 0, modifiedCount: 0 };
       }
 
-      const { updated: baseUpdated, delta } = applyUpdate(doc, update);
+      const { updated: baseUpdated, delta, deleted } = applyUpdate(doc, update);
 
       const validated = this.validate(this.excludeId(baseUpdated));
       const updated: Document = { ...validated, _id: doc._id } as Document;
 
       this.indexManager.validateUpdate(doc, updated);
 
-      const record = createUpdateRecord(doc._id, delta);
+      const record = createUpdateRecord(doc._id, delta, deleted);
       appendToFile(this.filePath, record);
 
       this.documents.set(doc._id, updated);
@@ -373,14 +384,14 @@ export class Collection<T extends Record<string, unknown> = Record<string, unkno
       let modifiedCount = 0;
 
       for (const doc of docs) {
-        const { updated: baseUpdated, delta } = applyUpdate(doc, update);
+        const { updated: baseUpdated, delta, deleted } = applyUpdate(doc, update);
 
         const validated = this.validate(this.excludeId(baseUpdated));
         const updated: Document = { ...validated, _id: doc._id } as Document;
 
         this.indexManager.validateUpdate(doc, updated);
 
-        const record = createUpdateRecord(doc._id, delta);
+        const record = createUpdateRecord(doc._id, delta, deleted);
         appendToFile(this.filePath, record);
 
         this.documents.set(doc._id, updated);
@@ -445,7 +456,7 @@ export class Collection<T extends Record<string, unknown> = Record<string, unkno
 
       this.indexManager.validateUpdate(doc, replaced);
 
-      const record = createUpdateRecord(doc._id, replaced);
+      const record = createReplaceRecord(replaced);
       appendToFile(this.filePath, record);
 
       this.documents.set(doc._id, replaced);
@@ -544,7 +555,7 @@ export class Collection<T extends Record<string, unknown> = Record<string, unkno
         continue;
       }
 
-      const value = (doc as Record<string, unknown>)[field as string];
+      const value = getNestedValue(doc, field as string);
       if (value !== undefined) {
         values.add(value);
       }

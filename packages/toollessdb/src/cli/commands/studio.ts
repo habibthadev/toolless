@@ -194,7 +194,9 @@ export function registerStudioCommand(program: Command): void {
         const host = options.host;
 
         if (!fs.existsSync(basePath)) {
-          fs.mkdirSync(basePath, { recursive: true });
+          printError(`Database directory not found: ${basePath}`);
+          printInfo("Create the directory or run from your project root (default: ./data)");
+          process.exit(1);
         }
 
         const clientPath = basePath.endsWith(".tdb") ? path.dirname(basePath) : basePath;

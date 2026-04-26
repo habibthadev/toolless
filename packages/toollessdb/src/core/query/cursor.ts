@@ -138,7 +138,6 @@ export class Cursor<T> {
   private limitValue: number | undefined;
   private skipValue: number | undefined;
   private projectionSpec: ProjectionSpec | undefined;
-  private executed = false;
   private cachedResults: Document[] | undefined;
 
   constructor(documents: Map<string, Document>, filter: Filter<T>) {
@@ -195,9 +194,7 @@ export class Cursor<T> {
       results = results.map((doc) => applyProjection(doc, this.projectionSpec as ProjectionSpec));
     }
 
-    this.executed = true;
     this.cachedResults = results;
-
     return results;
   }
 
@@ -213,10 +210,22 @@ export class Cursor<T> {
   }
 
   async count(): Promise<number> {
-    const origProjection = this.projectionSpec;
-    this.projectionSpec = { _id: 1 };
-    const results = this.execute();
-    this.projectionSpec = origProjection;
+    let results: Document[] = [];
+
+    for (const doc of this.documents.values()) {
+      if (matchFilter(doc, this.filter)) {
+        results.push(doc);
+      }
+    }
+
+    if (this.skipValue !== undefined && this.skipValue > 0) {
+      results = results.slice(this.skipValue);
+    }
+
+    if (this.limitValue !== undefined && this.limitValue >= 0) {
+      results = results.slice(0, this.limitValue);
+    }
+
     return results.length;
   }
 

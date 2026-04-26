@@ -13,9 +13,9 @@ toollessdb studio [dbPath]
 
 ## Arguments
 
-| Argument   | Description                           |
-| ---------- | ------------------------------------- |
-| `[dbPath]` | Path to database directory (optional) |
+| Argument   | Description                                    |
+| ---------- | ---------------------------------------------- |
+| `[dbPath]` | Path to database directory (default: `./data`) |
 
 ## Options
 
@@ -23,6 +23,11 @@ toollessdb studio [dbPath]
 | --------------- | ----------------- | ----------- |
 | `--port <port>` | Port to listen on | `4000`      |
 | `--host <host>` | Host to bind to   | `localhost` |
+
+<Callout type="warn" title="Directory must exist">
+  Studio requires the database directory to exist before starting. It will not create the `./data`
+  folder automatically. Run your app first or create the directory manually.
+</Callout>
 
 ## Examples
 

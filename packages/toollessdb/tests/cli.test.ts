@@ -82,7 +82,9 @@ describe("CLI Edge Cases", () => {
 
       const client = createClient({ path: dbPath });
       const db = client.db("testdb");
-      await db.collection("empty");
+      const coll = db.collection("empty");
+      const inserted = await coll.insertOne({ _placeholder: true });
+      await coll.deleteOne({ _id: inserted.insertedId });
       await client.close();
 
       const result = await execa("node", [CLI_BIN, "query", "testdb", "empty", "-p", dbPath], {

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-03-26
+
+### Fixed
+
+- **`cursor.count()` cache corruption** — `count()` was temporarily setting `projectionSpec = {_id:1}` and calling `execute()`, which poisoned the cursor cache so all subsequent `toArray()` calls returned `_id`-only documents. Rewritten to iterate directly without touching `cachedResults`.
+- **`$unset` / `$rename` fields surviving as `null` after restart** — `applyUpdate()` was writing `delta[field] = null` for `$unset` and `$rename`, which `replayLog()` spread onto the document. After a restart, removed fields reappeared with value `null`. Introduced a `deleted` array in `OperationRecord` that `replayLog()` strips from the document.
+- **`replaceOne` old fields surviving restart** — `replaceOne` was stored as an `"update"` delta; on replay `{ ...old, ...replacement }` kept stale fields not in the replacement. Added a `"replace"` op type so `replayLog()` sets the document directly.
+- **`distinct()` ignoring dot-notation paths** — Used `doc[field]` bracket access instead of the existing `getNestedValue()` helper, so `distinct("address.city")` silently returned nothing.
+- **`dropCollection()` leaving orphan files** — Only called `coll.drop()` when the collection was in the in-memory cache; unloaded collections left `.tdb` and `.idx.tdb` files on disk. Now always deletes files directly regardless of cache state.
+
+### Changed
+
+- **CLI: Zero-config `./data` paradigm** — All CLI commands now default to `./data` relative to the current working directory. No directory walking, no config files. Pass `--path` to use a different location.
+- **CLI: Studio and Shell no longer auto-create directories** — Both commands exit immediately with a clear error if the data directory does not exist, instead of silently creating a new empty directory.
+
 ## [1.0.1] - 2026-03-26
 
 ### Changed

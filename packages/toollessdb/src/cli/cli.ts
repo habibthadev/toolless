@@ -24,7 +24,7 @@ const program = new Command();
 program
   .name("toollessdb")
   .description("Command-line interface for ToollessDB database")
-  .version("1.0.1");
+  .version("1.0.2");
 
 registerListCommand(program);
 registerQueryCommand(program);

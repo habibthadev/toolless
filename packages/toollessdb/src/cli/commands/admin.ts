@@ -9,7 +9,7 @@ export function registerCompactCommand(program: Command): void {
   program
     .command("compact <database> [collection]")
     .description("Compact a collection or all collections in a database")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .action(async (database: string, collection: string | undefined, options) => {
       try {
         const resolved = resolveDatabase(database, options.path);
@@ -53,7 +53,7 @@ export function registerDropCommand(program: Command): void {
   program
     .command("drop <database> <collection>")
     .description("Drop a collection")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .option("-f, --force", "Skip confirmation")
     .action(async (database: string, collection: string, options) => {
       try {
@@ -88,7 +88,7 @@ export function registerExportCommand(program: Command): void {
   program
     .command("export <database> <collection>")
     .description("Export a collection to JSON")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .option("-o, --output <file>", "Output file (default: stdout)")
     .option("--pretty", "Pretty print JSON")
     .action(async (database: string, collection: string, options) => {
@@ -127,12 +127,12 @@ export function registerImportCommand(program: Command): void {
   program
     .command("import <database> <collection> <file>")
     .description("Import documents from JSON file")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .option("--drop", "Drop collection before import")
     .action(async (database: string, collection: string, file: string, options) => {
       try {
         const resolved = resolveDatabase(database, options.path);
-        const basePath = resolved?.basePath ?? options.path;
+        const basePath = resolved?.basePath ?? path.resolve(options.path);
         const dbName = resolved?.dbName ?? database;
 
         const client = createClient({ path: basePath });

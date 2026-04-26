@@ -113,9 +113,10 @@ function deepEqual(a: unknown, b: unknown): boolean {
 export function applyUpdate<T>(
   doc: Document,
   update: Update<T>
-): { updated: Document; delta: Record<string, unknown> } {
+): { updated: Document; delta: Record<string, unknown>; deleted: string[] } {
   const result = deepClone(doc);
   const delta: Record<string, unknown> = {};
+  const deleted: string[] = [];
 
   if (update.$set !== undefined) {
     for (const [field, value] of Object.entries(update.$set)) {
@@ -133,7 +134,7 @@ export function applyUpdate<T>(
         throw new ImmutableFieldError("_id");
       }
       deleteNestedValue(result, field);
-      delta[field] = null;
+      deleted.push(field);
     }
   }
 
@@ -265,7 +266,7 @@ export function applyUpdate<T>(
       if (value !== undefined) {
         deleteNestedValue(result, oldField);
         setNestedValue(result, newField as string, value);
-        delta[oldField] = null;
+        deleted.push(oldField);
         delta[newField as string] = value;
       }
     }
@@ -328,7 +329,7 @@ export function applyUpdate<T>(
 
   result._id = doc._id;
 
-  return { updated: result, delta };
+  return { updated: result, delta, deleted };
 }
 
 export function applyReplacement(doc: Document, replacement: Record<string, unknown>): Document {

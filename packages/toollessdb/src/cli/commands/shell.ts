@@ -1,16 +1,10 @@
 import { Command } from "commander";
 import * as fs from "node:fs";
+import * as path from "node:path";
 import * as readline from "node:readline";
 import { createClient } from "../../index";
 import type { Client } from "../../index";
-import {
-  colors,
-  formatJson,
-  printError,
-  printSuccess,
-  printInfo,
-  getDefaultBasePath,
-} from "../utils";
+import { colors, formatJson, printError, printSuccess, printInfo } from "../utils";
 
 interface ShellState {
   client: Client | null;
@@ -286,14 +280,10 @@ export function registerShellCommand(program: Command): void {
     .command("shell")
     .alias("sh")
     .description("Start interactive shell")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .option("-d, --database <name>", "Initial database to use")
     .action(async (options) => {
-      const basePath = options.path === "." ? getDefaultBasePath() : options.path;
-
-      if (!fs.existsSync(basePath)) {
-        fs.mkdirSync(basePath, { recursive: true });
-      }
+      const basePath = path.resolve(options.path);
 
       const state: ShellState = {
         client: null,

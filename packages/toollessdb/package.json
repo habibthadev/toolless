@@ -1,6 +1,6 @@
 {
   "name": "toollessdb",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A file-based document database for Node.js with MongoDB-compatible API, CLI, and Studio UI",
   "keywords": [
     "database",

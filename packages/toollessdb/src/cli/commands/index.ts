@@ -1,4 +1,5 @@
 import { Command } from "commander";
+import * as path from "node:path";
 import { createClient } from "../../index";
 import Table from "cli-table3";
 import { colors, formatJson, printError, printSuccess, resolveDatabase } from "../utils";
@@ -9,7 +10,7 @@ export function registerIndexCommand(program: Command): void {
   indexCmd
     .command("list <database> <collection>")
     .description("List indexes on a collection")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .option("--json", "Output as JSON")
     .action(async (database: string, collection: string, options) => {
       try {
@@ -62,13 +63,13 @@ export function registerIndexCommand(program: Command): void {
   indexCmd
     .command("create <database> <collection> <spec>")
     .description('Create an index (spec: {"field": 1} or {"a": 1, "b": -1})')
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .option("-n, --name <name>", "Index name")
     .option("-u, --unique", "Unique index")
     .action(async (database: string, collection: string, specStr: string, options) => {
       try {
         const resolved = resolveDatabase(database, options.path);
-        const basePath = resolved?.basePath ?? options.path;
+        const basePath = resolved?.basePath ?? path.resolve(options.path);
         const dbName = resolved?.dbName ?? database;
 
         const client = createClient({ path: basePath });
@@ -94,7 +95,7 @@ export function registerIndexCommand(program: Command): void {
   indexCmd
     .command("drop <database> <collection> <name>")
     .description("Drop an index by name")
-    .option("-p, --path <path>", "Path to database directory", ".")
+    .option("-p, --path <path>", "Path to database directory", "data")
     .action(async (database: string, collection: string, name: string, options) => {
       try {
         const resolved = resolveDatabase(database, options.path);

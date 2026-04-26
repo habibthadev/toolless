@@ -3,7 +3,7 @@ import * as path from "node:path";
 import type { z } from "zod";
 import { Collection, type CollectionOptions } from "./collection";
 import type { DatabaseMeta } from "./types/index";
-import { atomicWrite } from "./storage/ndjson";
+import { atomicWrite, deleteCollectionFile } from "./storage/ndjson";
 import { validateName } from "./client";
 
 const META_FILE_NAME = "_meta.json";
@@ -90,6 +90,9 @@ export class Database {
     if (coll !== undefined) {
       await coll.drop();
       this.collections.delete(name);
+    } else {
+      const collFilePath = path.join(this.dbPath, `${name}.tdb`);
+      deleteCollectionFile(collFilePath);
     }
 
     const index = this.meta.collections.indexOf(name);

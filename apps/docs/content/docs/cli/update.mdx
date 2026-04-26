@@ -7,7 +7,7 @@ description: Update command reference
 
 ```bash title="update.sh"
 toollessdb update <database> <collection> <filter> <update>
-  --path <path>        Path to database directory (default: ".")
+  --path <path>        Path to database directory (default: ./data)
   --many               Update all matching documents
   --upsert             Create document if not found
   --json               Output result as JSON
@@ -17,12 +17,12 @@ toollessdb update <database> <collection> <filter> <update>
 
 ## Options
 
-| Option          | Description                   | Default |
-| --------------- | ----------------------------- | ------- |
-| `--path <path>` | Path to database directory    | `"."`   |
-| `--many`        | Update all matching documents | -       |
-| `--upsert`      | Create document if not found  | -       |
-| `--json`        | Output result as JSON         | -       |
+| Option          | Description                   | Default  |
+| --------------- | ----------------------------- | -------- |
+| `--path <path>` | Path to database directory    | `./data` |
+| `--many`        | Update all matching documents | -        |
+| `--upsert`      | Create document if not found  | -        |
+| `--json`        | Output result as JSON         | -        |
 
 ## Arguments
 
